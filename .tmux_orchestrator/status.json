@@ -1,11 +1,11 @@
 {
-  "last_updated": "2025-08-24T22:33:19.355457+00:00",
+  "last_updated": "2025-08-24T22:38:30.342592+00:00",
   "daemon_status": {
     "monitor": {
       "running": true,
       "pid": 70843,
-      "uptime_seconds": 6980,
-      "last_check": "2025-08-24T22:33:19.354592"
+      "uptime_seconds": 7291,
+      "last_check": "2025-08-24T22:38:30.342219"
     },
     "messaging": {
       "running": false,
@@ -16,22 +16,22 @@
     "gitcommit:2": {
       "name": "claude-pm",
       "type": "Project Manager",
-      "status": "active",
-      "last_activity": "2025-08-24T22:33:19.354425",
+      "status": "idle",
+      "last_activity": "2025-08-24T22:38:30.342199",
       "pane_id": null,
       "session": "gitcommit",
       "window": 2,
       "state_details": {
         "idle_count": 0,
         "content_based_state": "active",
-        "last_content_check": "2025-08-24T22:33:19.354441"
+        "last_content_check": "2025-08-24T22:38:30.342209"
       }
     }
   },
   "summary": {
     "total_agents": 1,
-    "active": 1,
-    "idle": 0,
+    "active": 0,
+    "idle": 1,
     "error": 0,
     "busy": 0,
     "unknown": 0
