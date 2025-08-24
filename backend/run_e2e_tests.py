@@ -9,7 +9,9 @@ import os
 import uuid
 from pathlib import Path
 
-# Set test environment variables BEFORE importing anything else
+import uvicorn
+
+# Set test environment variables BEFORE importing app
 os.environ["TESTING"] = "true"
 
 # Generate unique test database for this test run
@@ -22,10 +24,8 @@ print(f"🗄️  Test Database: {test_db_path}")
 print(f"🔒 TESTING Mode: {os.environ.get('TESTING')}")
 print(f"🔗 Database URL: {os.environ.get('DATABASE_URL')}")
 
-# Import after environment is set
-import uvicorn
-
-from app.main import app
+# Import app after environment setup
+from app.main import app  # noqa: E402
 
 if __name__ == "__main__":
     # Configure logging

@@ -68,8 +68,10 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
-"tests/*" = ["S101"]
+"tests/*" = ["S101", "E501", "B007", "N806"]  # Test files: allow long lines, unused vars, naming
 "backend/app/models/*" = ["F821"]  # Allow forward references in SQLModel relationships
+"backend/test_*.py" = ["E501", "B007"]  # Test scripts: allow long lines and unused vars
+"backend/run_*.py" = ["E402"]  # Run scripts: allow imports after env setup
 
 [tool.black]
 line-length = 100

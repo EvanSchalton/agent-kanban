@@ -34,7 +34,8 @@ class ConnectionManager:
             client_id = self.connection_info[websocket].get("client_id", "unknown")
             del self.connection_info[websocket]
             print(
-                f"Client {client_id} disconnected. Total connections: {len(self.active_connections)}"
+                f"Client {client_id} disconnected. Total connections: "
+                f"{len(self.active_connections)}"
             )
 
     async def send_personal_message(self, message: str, websocket: WebSocket):

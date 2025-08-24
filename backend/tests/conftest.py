@@ -62,8 +62,8 @@ def memory_db() -> Generator[Session, None, None]:
     SQLModel.metadata.create_all(engine)
 
     # Create session
-    SessionLocal = sessionmaker(bind=engine, class_=Session)
-    session = SessionLocal()
+    session_local = sessionmaker(bind=engine, class_=Session)
+    session = session_local()
 
     try:
         yield session
@@ -85,8 +85,8 @@ def file_db() -> Generator[Session, None, None]:
     SQLModel.metadata.create_all(engine)
 
     # Create session
-    SessionLocal = sessionmaker(bind=engine, class_=Session)
-    session = SessionLocal()
+    session_local = sessionmaker(bind=engine, class_=Session)
+    session = session_local()
 
     # Log the database file for debugging
     print(f"Test database created: {db_name}")
@@ -114,8 +114,8 @@ def db(request) -> Generator[Session, None, None]:
         SQLModel.metadata.create_all(engine)
 
         # Create session
-        SessionLocal = sessionmaker(bind=engine, class_=Session)
-        session = SessionLocal()
+        session_local = sessionmaker(bind=engine, class_=Session)
+        session = session_local()
 
         # Log the database file for debugging
         print(f"Test database created: {db_name}")
@@ -136,8 +136,8 @@ def db(request) -> Generator[Session, None, None]:
         SQLModel.metadata.create_all(engine)
 
         # Create session
-        SessionLocal = sessionmaker(bind=engine, class_=Session)
-        session = SessionLocal()
+        session_local = sessionmaker(bind=engine, class_=Session)
+        session = session_local()
 
         try:
             yield session
