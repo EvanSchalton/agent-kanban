@@ -1,11 +1,11 @@
 {
-  "last_updated": "2025-08-24T22:38:50.352598+00:00",
+  "last_updated": "2025-08-24T22:42:11.389241+00:00",
   "daemon_status": {
     "monitor": {
       "running": true,
       "pid": 70843,
-      "uptime_seconds": 7311,
-      "last_check": "2025-08-24T22:38:50.352251"
+      "uptime_seconds": 7512,
+      "last_check": "2025-08-24T22:42:11.388852"
     },
     "messaging": {
       "running": false,
@@ -14,17 +14,17 @@
   },
   "agents": {
     "gitcommit:2": {
-      "name": "claude-pm",
-      "type": "Project Manager",
+      "name": "unknown",
+      "type": "unknown",
       "status": "idle",
-      "last_activity": "2025-08-24T22:38:50.352233",
+      "last_activity": "2025-08-24T22:42:11.388836",
       "pane_id": null,
       "session": "gitcommit",
       "window": 2,
       "state_details": {
         "idle_count": 0,
-        "content_based_state": "active",
-        "last_content_check": "2025-08-24T22:38:50.352242"
+        "content_based_state": "idle",
+        "last_content_check": "2025-08-24T22:42:11.388845"
       }
     }
   },
