@@ -120,8 +120,13 @@ class APITester:
         for i in range(count):
             try:
                 payload = {
-                    "title": f"Ticket #{i + 1:03d}: {random.choice(['Feature', 'Bug', 'Task', 'Story'])}",
-                    "description": f"Auto-generated ticket for QA testing. Priority: {random.choice(priorities)}",
+                    "title": (
+                        f"Ticket #{i + 1:03d}: {random.choice(['Feature', 'Bug', 'Task', 'Story'])}"
+                    ),
+                    "description": (
+                        f"Auto-generated ticket for QA testing. "
+                        f"Priority: {random.choice(priorities)}"
+                    ),
                     "priority": random.choice(priorities),
                     "assigned_to": random.choice(assignees),
                     "estimate_hours": random.choice([1, 2, 4, 8]),

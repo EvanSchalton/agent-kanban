@@ -88,7 +88,8 @@ def test_mcp_stdio():
                             print(f"   Response: {content.get('text', '')}")
             elif "error" in response:
                 print(
-                    f"⚠️  Tool call returned error (expected if API not running): {response['error']['message']}"
+                    f"⚠️  Tool call returned error (expected if API not running): "
+                    f"{response['error']['message']}"
                 )
             else:
                 print(f"❌ Tool call failed: {response}")

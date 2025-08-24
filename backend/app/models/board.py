@@ -1,8 +1,11 @@
 import json
 from datetime import datetime
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 from sqlmodel import Field, Relationship, SQLModel
+
+if TYPE_CHECKING:
+    from .ticket import Ticket
 
 
 class Board(SQLModel, table=True):

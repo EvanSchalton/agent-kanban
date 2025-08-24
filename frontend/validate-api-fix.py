@@ -132,7 +132,8 @@ def generate_report(results):
     critical_passed = all(results.get(test, False) for test in critical_tests)
 
     print(
-        f"\n🎯 Card Creation Fix Status: {'✅ WORKING' if critical_passed else '❌ NEEDS ATTENTION'}"
+        f"\n🎯 Card Creation Fix Status: "
+        f"{'✅ WORKING' if critical_passed else '❌ NEEDS ATTENTION'}"
     )
 
     if critical_passed:

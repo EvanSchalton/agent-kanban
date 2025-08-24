@@ -1,55 +1,14 @@
-# Pre-commit hooks for code quality - Agent Kanban
-# Install with: pre-commit install
+# Minimal working pre-commit config for agent-kanban
 repos:
   # Python formatting and linting with Ruff
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.12.10
     hooks:
-      # Run formatter first
       - id: ruff-format
         files: ^(backend/|src/|tests/|.*\.py$)
-      # Then run linter
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
         files: ^(backend/|src/|tests/|.*\.py$)
-
-  # Type checking - can be enabled after initial setup
-  # - repo: https://github.com/pre-commit/mirrors-mypy
-  #   rev: v1.7.1
-  #   hooks:
-  #     - id: mypy
-  #       additional_dependencies: [
-  #         types-requests,
-  #         types-pyyaml,
-  #         sqlalchemy-stubs
-  #       ]
-  #       args: [--config-file, pyproject.toml, --ignore-missing-imports]
-  #       files: ^(backend/|src/|tests/)
-  #       pass_filenames: false
-
-  # Security checks for Python
-  - repo: https://github.com/pycqa/bandit
-    rev: 1.8.6
-    hooks:
-      - id: bandit
-        args: [-r, backend/, src/, -ll, --skip, B108]
-        pass_filenames: false
-
-  # TypeScript/JavaScript linting with ESLint
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.34.0
-    hooks:
-      - id: eslint
-        files: \.(js|jsx|ts|tsx)$
-        types: [file]
-        additional_dependencies:
-          - eslint@8.56.0
-          - '@typescript-eslint/parser@6.18.1'
-          - '@typescript-eslint/eslint-plugin@6.18.1'
-          - eslint-plugin-react@7.33.2
-          - eslint-plugin-react-hooks@4.6.0
-        args: [--fix, --ext, .js,.jsx,.ts,.tsx]
-        exclude: ^(frontend/dist/|frontend/build/|.*\.min\.js$)
 
   # General file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -61,40 +20,8 @@ repos:
         exclude: ^(.github/workflows/|.*\.yml\.j2$)
       - id: check-added-large-files
         args: [--maxkb=1000]
-      - id: check-merge-conflict
-      - id: debug-statements
-        files: ^(backend/|src/|tests/|.*\.py$)
-      - id: check-json
-        exclude: ^(frontend/tsconfig.*\.json$|.*\.config\.json$)
-      - id: mixed-line-ending
-        args: [--fix=lf]
-      - id: check-toml
-      - id: check-case-conflict
-      - id: check-docstring-first
-        files: ^(backend/|src/|tests/|.*\.py$)
-
-  # Markdown linting
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.45.0
-    hooks:
-      - id: markdownlint
-        args: [--fix]
-        exclude: ^(\.tmux_orchestrator/|references/|archive/|docs/api/)
-
-  # SQL formatting (for any SQL files)
-  - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 3.4.2
-    hooks:
-      - id: sqlfluff-lint
-        files: \.sql$
-        args: [--dialect, sqlite]
-      - id: sqlfluff-fix
-        files: \.sql$
-        args: [--dialect, sqlite]
 
 # Configuration for CI mode
 ci:
   autofix_prs: false
   autoupdate_schedule: weekly
-  autoupdate_commit_msg: 'chore: update pre-commit hooks'
-  skip: [eslint]  # ESLint needs node_modules

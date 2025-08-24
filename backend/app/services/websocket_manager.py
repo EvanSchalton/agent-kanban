@@ -179,7 +179,8 @@ class ConnectionManager:
         async with self._lock:
             for client_id, websocket in self.active_connections.items():
                 client_boards = self.board_subscriptions.get(client_id, set())
-                # Client is subscribed if they have the specific board_id or are subscribed to all (-1)
+                # Client is subscribed if they have the specific board_id
+                # or are subscribed to all (-1)
                 if board_id in client_boards or -1 in client_boards:
                     connections_copy[client_id] = websocket
                 elif (
@@ -212,7 +213,8 @@ class ConnectionManager:
 
         if failed_clients:
             logger.info(
-                f"Board {board_id} broadcast: {successful_sends} successful, {len(failed_clients)} disconnected"
+                f"Board {board_id} broadcast: {successful_sends} successful, "
+                f"{len(failed_clients)} disconnected"
             )
 
         return successful_sends
@@ -289,7 +291,8 @@ class ConnectionManager:
             await self.disconnect(client_id)
 
         logger.info(
-            f"Batch broadcast: {results['successful_batches']} successful, {results['failed_clients']} failed"
+            f"Batch broadcast: {results['successful_batches']} successful, "
+            f"{results['failed_clients']} failed"
         )
         return results
 
@@ -423,7 +426,8 @@ class ConnectionManager:
 
         for client_id in stale_clients:
             logger.warning(
-                f"Disconnecting stale client {client_id} (missed {max_missed_heartbeats} heartbeats)"
+                f"Disconnecting stale client {client_id} "
+                f"(missed {max_missed_heartbeats} heartbeats)"
             )
             await self.disconnect(client_id)
 

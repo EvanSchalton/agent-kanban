@@ -86,7 +86,8 @@ def create_test_data(db_path):
         for i in range(3):
             cursor.execute(
                 """
-                INSERT INTO tickets (title, description, board_id, current_column, priority, created_at, updated_at, column_entered_at)
+                INSERT INTO tickets (title, description, board_id, current_column, priority,
+                                   created_at, updated_at, column_entered_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
                 (

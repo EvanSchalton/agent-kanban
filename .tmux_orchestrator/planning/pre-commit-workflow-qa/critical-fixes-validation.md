@@ -19,12 +19,12 @@ f"{init_result['tables_created']}"
 - **Current**: 80 chars (within limit)
 - **Status**: May already be within limits
 
-#### ⏳ error_handlers.py line 268 - CHECK NEEDED  
+#### ⏳ error_handlers.py line 268 - CHECK NEEDED
 - **Current**: 114 chars (exceeds 88 limit)
 - **Status**: NEEDS FIXING
 
 #### ⏳ monitoring.py line 116 - CHECK NEEDED
-- **Current**: 116 chars (exceeds 88 limit)  
+- **Current**: 116 chars (exceeds 88 limit)
 - **Status**: NEEDS FIXING
 
 #### ⏳ monitoring.py line 146 - CHECK NEEDED

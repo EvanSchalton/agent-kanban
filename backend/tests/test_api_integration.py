@@ -163,7 +163,7 @@ class TestBoardEndpoints:
         if self.test_board_id:
             try:
                 self.client.delete_board(self.test_board_id)
-            except:
+            except Exception:
                 pass
         self.client.close()
 
@@ -241,12 +241,12 @@ class TestTicketEndpoints:
         for ticket_id in self.test_ticket_ids:
             try:
                 self.client.delete_ticket(ticket_id)
-            except:
+            except Exception:
                 pass
         # Clean up board
         try:
             self.client.delete_board(self.board["id"])
-        except:
+        except Exception:
             pass
         self.client.close()
 
@@ -346,13 +346,13 @@ class TestCommentEndpoints:
         for comment_id in self.test_comment_ids:
             try:
                 self.client.delete_comment(comment_id)
-            except:
+            except Exception:
                 pass
         # Clean up ticket and board
         try:
             self.client.delete_ticket(self.ticket["id"])
             self.client.delete_board(self.board["id"])
-        except:
+        except Exception:
             pass
         self.client.close()
 

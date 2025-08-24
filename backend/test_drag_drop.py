@@ -17,7 +17,8 @@ def test_drag_drop():
     ).json()
     ticket_id = ticket["id"]
     print(
-        f"✅ Created ticket: {ticket['title']} (ID: {ticket_id}) in column: {ticket['current_column']}"
+        f"✅ Created ticket: {ticket['title']} (ID: {ticket_id}) "
+        f"in column: {ticket['current_column']}"
     )
 
     # Move the ticket (drag-drop simulation) - using POST

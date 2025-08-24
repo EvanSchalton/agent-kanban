@@ -240,7 +240,7 @@ class TestWebSocketIntegration:
                 data = websocket.receive_json(timeout=1.0)
                 # Event structure depends on implementation
                 assert data is not None
-            except:
+            except Exception:
                 # Some implementations may not broadcast to same connection
                 pass
 

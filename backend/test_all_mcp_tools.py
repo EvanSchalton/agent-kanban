@@ -380,7 +380,8 @@ class ComprehensiveMCPTestSuite:
                         moves_successful += 1
                     else:
                         print(
-                            f"Move verification failed: expected {to_col}, got {updated_ticket['column']}"
+                            f"Move verification failed: expected {to_col}, "
+                            f"got {updated_ticket['column']}"
                         )
                         break
 

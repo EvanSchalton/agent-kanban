@@ -19,7 +19,8 @@ async def test_board_isolation():
         # Check first few tickets
         for ticket in data1["tickets"][:3]:
             print(
-                f"  - Ticket {ticket['id']}: board_id={ticket.get('board_id')}, title={ticket['title'][:30]}"
+                f"  - Ticket {ticket['id']}: board_id={ticket.get('board_id')}, "
+                f"title={ticket['title'][:30]}"
             )
 
         print()
@@ -33,7 +34,8 @@ async def test_board_isolation():
         # Check first few tickets
         for ticket in data2["tickets"][:3]:
             print(
-                f"  - Ticket {ticket['id']}: board_id={ticket.get('board_id')}, title={ticket['title'][:30]}"
+                f"  - Ticket {ticket['id']}: board_id={ticket.get('board_id')}, "
+                f"title={ticket['title'][:30]}"
             )
 
         print()
@@ -79,7 +81,8 @@ async def test_board_isolation():
         if create_response.status_code == 201:
             created_ticket = create_response.json()
             print(
-                f"✅ Created ticket {created_ticket['id']} with board_id={created_ticket.get('board_id')}"
+                f"✅ Created ticket {created_ticket['id']} "
+                f"with board_id={created_ticket.get('board_id')}"
             )
 
             # Verify it appears in board 2

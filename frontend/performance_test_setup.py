@@ -65,8 +65,14 @@ def create_tasks(board_id, count=500):
             priority = random.choice(PRIORITIES)
 
             task_data = {
-                "title": f"Task {i:03d}: {random.choice(['Implement', 'Fix', 'Review', 'Test', 'Deploy'])} {random.choice(['feature', 'bug', 'API', 'UI', 'database'])}",
-                "description": f"Performance test task #{i}. This task is part of the load testing suite.",
+                "title": (
+                    f"Task {i:03d}: "
+                    f"{random.choice(['Implement', 'Fix', 'Review', 'Test', 'Deploy'])} "
+                    f"{random.choice(['feature', 'bug', 'API', 'UI', 'database'])}"
+                ),
+                "description": (
+                    f"Performance test task #{i}. This task is part of the load testing suite."
+                ),
                 "board_id": board_id,
                 "current_column": column,
                 "priority": priority,
