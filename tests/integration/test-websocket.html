@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+</head>
+<body>
+    <h1>WebSocket Test</h1>
+    <div id="status">Connecting...</div>
+    <div id="messages"></div>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:15173/ws/connect');
+        const status = document.getElementById('status');
+        const messages = document.getElementById('messages');
+
+        ws.onopen = (event) => {
+            status.textContent = 'Connected!';
+            console.log('WebSocket connected', event);
+        };
+
+        ws.onmessage = (event) => {
+            const div = document.createElement('div');
+            div.textContent = 'Message: ' + event.data;
+            messages.appendChild(div);
+            console.log('WebSocket message', event.data);
+        };
+
+        ws.onerror = (error) => {
+            status.textContent = 'Error: ' + error;
+            console.error('WebSocket error', error);
+        };
+
+        ws.onclose = (event) => {
+            status.textContent = 'Disconnected (code: ' + event.code + ')';
+            console.log('WebSocket closed', event);
+        };
+    </script>
+</body>
+</html>

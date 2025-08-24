@@ -1,0 +1,70 @@
+{
+  "summary": {
+    "total": 10,
+    "passed": 9,
+    "failed": 1,
+    "success_rate": 90.0
+  },
+  "results": [
+    {
+      "test": "Health Check",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-08-10T23:39:15.190313"
+    },
+    {
+      "test": "List Boards (corrected)",
+      "success": true,
+      "details": "Found 20 boards",
+      "timestamp": "2025-08-10T23:39:15.204484"
+    },
+    {
+      "test": "Get Board 1",
+      "success": true,
+      "details": "Board: Test Board",
+      "timestamp": "2025-08-10T23:39:15.216009"
+    },
+    {
+      "test": "Get Board 1 Tickets",
+      "success": true,
+      "details": "Found 50 tickets",
+      "timestamp": "2025-08-10T23:39:15.252247"
+    },
+    {
+      "test": "Create Test Ticket",
+      "success": false,
+      "details": "Status: 201",
+      "timestamp": "2025-08-10T23:39:15.310245"
+    },
+    {
+      "test": "Get Default Board",
+      "success": true,
+      "details": "Status: 200 (should work now)",
+      "timestamp": "2025-08-10T23:39:15.326524"
+    },
+    {
+      "test": "WebSocket Connection",
+      "success": true,
+      "details": "Connected and sent message",
+      "timestamp": "2025-08-10T23:39:16.352479"
+    },
+    {
+      "test": "List Boards Performance",
+      "success": true,
+      "details": "Avg: 24.8ms, Min: 11.2ms, Max: 44.6ms",
+      "timestamp": "2025-08-10T23:39:16.428361"
+    },
+    {
+      "test": "Get Board 1 Performance",
+      "success": true,
+      "details": "Avg: 11.5ms, Min: 9.1ms, Max: 14.4ms",
+      "timestamp": "2025-08-10T23:39:16.463559"
+    },
+    {
+      "test": "List Tickets Performance",
+      "success": true,
+      "details": "Avg: 25.6ms, Min: 23.8ms, Max: 26.7ms",
+      "timestamp": "2025-08-10T23:39:16.540781"
+    }
+  ]
+}

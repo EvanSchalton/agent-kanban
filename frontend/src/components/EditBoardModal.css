@@ -1,0 +1,64 @@
+/* EditBoardModal inherits most styles from CreateBoardModal.css */
+/* Import the base modal styles */
+@import "./CreateBoardModal.css";
+
+/* Additional or override styles specific to EditBoardModal can be added here */
+
+/* Example: You might want a different header color for edit mode */
+.edit-modal .modal-header {
+  border-bottom-color: #667eea;
+}
+
+.edit-modal .modal-header h2 {
+  color: #5a67d8;
+}
+
+/* Update button specific styling */
+.btn-update {
+  background: #667eea;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-update:hover:not(:disabled) {
+  background: #5a67d8;
+}
+
+.btn-update:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Delete button styling */
+.btn-danger {
+  background: #ef4444;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.btn-danger:disabled {
+  background: #fca5a5;
+  cursor: not-allowed;
+}

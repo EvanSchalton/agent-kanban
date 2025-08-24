@@ -1,0 +1,41 @@
+{
+  "timestamp": "2025-08-15T05:00:15.245559",
+  "summary": {
+    "total": 6,
+    "passed": 0,
+    "failed": 6,
+    "success_rate": 0.0
+  },
+  "results": [
+    {
+      "test": "Backend Health Check",
+      "status": "FAIL",
+      "message": "Health check error: HTTPConnectionPool(host='localhost', port=18000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fb0fd38a450>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "test": "Boards API Integration",
+      "status": "FAIL",
+      "message": "Boards API error: HTTPConnectionPool(host='localhost', port=18000): Max retries exceeded with url: /api/boards/ (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fb0fd39c790>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "test": "Tickets API Integration",
+      "status": "FAIL",
+      "message": "Tickets API error: HTTPConnectionPool(host='localhost', port=18000): Max retries exceeded with url: /api/tickets/ (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fb0fd39ea50>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "test": "MCP Tools Integration",
+      "status": "FAIL",
+      "message": "MCP tools error: HTTPConnectionPool(host='localhost', port=18000): Max retries exceeded with url: /api/tickets/?board_id=1 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fb0fd3a8dd0>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "test": "Ticket Creation",
+      "status": "FAIL",
+      "message": "Ticket creation error: HTTPConnectionPool(host='localhost', port=18000): Max retries exceeded with url: /api/tickets/ (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fb0fd3ab110>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    },
+    {
+      "test": "WebSocket Connectivity",
+      "status": "FAIL",
+      "message": "WebSocket test error: HTTPConnectionPool(host='localhost', port=18000): Max retries exceeded with url: /ws (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fb0fd39ea10>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    }
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "validation_time": "2025-08-20T06:34:32.625401",
+  "overall_success": true,
+  "results": {
+    "board_isolation": {
+      "passed": 4,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Multiple boards exist",
+          "passed": true,
+          "details": "Found 9 boards",
+          "timestamp": "2025-08-20T06:34:17.969603"
+        },
+        {
+          "name": "Board 1 shows only its tickets",
+          "passed": true,
+          "details": "47 tickets, all board_id=1",
+          "timestamp": "2025-08-20T06:34:18.206605"
+        },
+        {
+          "name": "Board 3 shows only its tickets",
+          "passed": true,
+          "details": "5 tickets, all board_id=3",
+          "timestamp": "2025-08-20T06:34:18.492963"
+        },
+        {
+          "name": "Cross-board contamination prevented",
+          "passed": true,
+          "details": "Ticket 58 in board 1: True, in board 3: False",
+          "timestamp": "2025-08-20T06:34:19.601003"
+        }
+      ]
+    },
+    "websocket_sync": {
+      "passed": 5,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "WebSocket connection available",
+          "passed": true,
+          "details": "SocketIO service running",
+          "timestamp": "2025-08-20T06:34:19.959054"
+        },
+        {
+          "name": "Card updates trigger WebSocket events",
+          "passed": true,
+          "details": "Update event should broadcast",
+          "timestamp": "2025-08-20T06:34:20.164493"
+        },
+        {
+          "name": "Drag-drop movements broadcast",
+          "passed": true,
+          "details": "Move event should broadcast",
+          "timestamp": "2025-08-20T06:34:21.082471"
+        },
+        {
+          "name": "Comments appear via WebSocket",
+          "passed": true,
+          "details": "Comment event should broadcast",
+          "timestamp": "2025-08-20T06:34:21.176765"
+        },
+        {
+          "name": "WebSocket endpoints configured",
+          "passed": true,
+          "details": "WebSocket endpoints active",
+          "timestamp": "2025-08-20T06:34:21.229708"
+        }
+      ]
+    },
+    "user_attribution": {
+      "passed": 4,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Tickets show attribution",
+          "passed": true,
+          "details": "Has attribution fields: True",
+          "timestamp": "2025-08-20T06:34:21.402381"
+        },
+        {
+          "name": "Comments show authors",
+          "passed": true,
+          "details": "All 1 comments have authors",
+          "timestamp": "2025-08-20T06:34:21.446343"
+        },
+        {
+          "name": "History logs capture users",
+          "passed": true,
+          "details": "3 history entries with attribution",
+          "timestamp": "2025-08-20T06:34:21.554041"
+        },
+        {
+          "name": "Updates track user attribution",
+          "passed": true,
+          "details": "Attribution preserved in updates",
+          "timestamp": "2025-08-20T06:34:21.839865"
+        }
+      ]
+    },
+    "mcp_integration": {
+      "passed": 1,
+      "failed": 1,
+      "tests": [
+        {
+          "name": "MCP server accessible",
+          "passed": true,
+          "details": "MCP tools importable",
+          "timestamp": "2025-08-20T06:34:31.552200"
+        },
+        {
+          "name": "MCP tools integration",
+          "passed": false,
+          "details": "Board 1 not found",
+          "timestamp": "2025-08-20T06:34:31.659015"
+        }
+      ]
+    },
+    "card_creation": {
+      "passed": 5,
+      "failed": 0,
+      "tests": [
+        {
+          "name": "Add card form creates ticket",
+          "passed": true,
+          "details": "Created card ID: 59",
+          "timestamp": "2025-08-20T06:34:32.048376"
+        },
+        {
+          "name": "Card appears in correct column",
+          "passed": true,
+          "details": "Card found in 'Not Started' column",
+          "timestamp": "2025-08-20T06:34:32.498714"
+        },
+        {
+          "name": "Card creation triggers WebSocket broadcast",
+          "passed": true,
+          "details": "WebSocket events configured for ticket creation",
+          "timestamp": "2025-08-20T06:34:32.498742"
+        },
+        {
+          "name": "No 'Method Not Allowed' errors",
+          "passed": true,
+          "details": "Status: 201",
+          "timestamp": "2025-08-20T06:34:32.498755"
+        },
+        {
+          "name": "Frontend payload format accepted",
+          "passed": true,
+          "details": "Frontend-style card created: 60",
+          "timestamp": "2025-08-20T06:34:32.572152"
+        }
+      ]
+    }
+  },
+  "test_tickets_created": [
+    58,
+    59,
+    60
+  ]
+}

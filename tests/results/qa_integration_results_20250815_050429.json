@@ -1,0 +1,45 @@
+{
+  "timestamp": "2025-08-15T05:04:29.780491",
+  "summary": {
+    "total": 6,
+    "passed": 3,
+    "failed": 3,
+    "success_rate": 50.0
+  },
+  "results": [
+    {
+      "test": "Backend Health Check",
+      "status": "PASS",
+      "message": {
+        "status": "healthy",
+        "socketio": "available",
+        "cors": "enabled"
+      }
+    },
+    {
+      "test": "Boards API Integration",
+      "status": "PASS",
+      "message": "Found 56 boards"
+    },
+    {
+      "test": "Tickets API Integration",
+      "status": "PASS",
+      "message": "Found 7 tickets"
+    },
+    {
+      "test": "MCP Tools Integration",
+      "status": "FAIL",
+      "message": "MCP tools error: HTTPConnectionPool(host='localhost', port=18000): Read timed out. (read timeout=5)"
+    },
+    {
+      "test": "Ticket Creation",
+      "status": "FAIL",
+      "message": "Ticket creation error: HTTPConnectionPool(host='localhost', port=18000): Read timed out. (read timeout=5)"
+    },
+    {
+      "test": "WebSocket Connectivity",
+      "status": "FAIL",
+      "message": "WebSocket test error: HTTPConnectionPool(host='localhost', port=18000): Read timed out. (read timeout=5)"
+    }
+  ]
+}

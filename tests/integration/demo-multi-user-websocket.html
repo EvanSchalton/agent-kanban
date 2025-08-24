@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Agent Kanban - Multi-User WebSocket Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .demo-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .demo-header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .demo-header p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .demo-controls {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideIn 0.6s ease;
+        }
+
+        .control-section {
+            margin-bottom: 20px;
+        }
+
+        .control-section h3 {
+            color: #2d3748;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #68d391 0%, #48bb78 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #63b3ed 0%, #4299e1 100%);
+            color: white;
+        }
+
+        .windows-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .window-simulation {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideUp 0.8s ease;
+        }
+
+        .window-header {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .window-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .user-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .connection-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-connected {
+            background: #68d391;
+            animation: pulse 2s infinite;
+        }
+
+        .status-disconnected {
+            background: #fc8181;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .window-body {
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+        }
+
+        .board-selector {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .board-selector select {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .event-log {
+            background: #1a202c;
+            color: #68d391;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        .event-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid transparent;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .event-own {
+            border-left-color: #4299e1;
+            background: rgba(66, 153, 225, 0.1);
+        }
+
+        .event-other {
+            border-left-color: #f6ad55;
+            background: rgba(246, 173, 85, 0.1);
+        }
+
+        .event-system {
+            border-left-color: #68d391;
+            background: rgba(104, 211, 145, 0.1);
+        }
+
+        .demo-status {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .status-card {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .status-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+
+        .status-label {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .action-buttons {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .mini-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #e2e8f0;
+            color: #4a5568;
+            transition: all 0.2s;
+        }
+
+        .mini-btn:hover {
+            background: #cbd5e0;
+        }
+
+        .highlight {
+            animation: highlight 1s ease;
+        }
+
+        @keyframes highlight {
+            0%, 100% { background: transparent; }
+            50% { background: rgba(102, 126, 234, 0.2); }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-header">
+        <h1>🎯 Agent Kanban - Multi-User WebSocket Demo</h1>
+        <p>Experience real-time collaboration with user attribution and board isolation</p>
+    </div>
+
+    <div class="demo-container">
+        <!-- Demo Controls -->
+        <div class="demo-controls">
+            <div class="control-section">
+                <h3>🚀 Quick Demo Actions</h3>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="startFullDemo()">
+                        <span>▶️</span> Start Full Demo
+                    </button>
+                    <button class="btn btn-success" onclick="openMultipleWindows()">
+                        <span>👥</span> Open 3 Windows
+                    </button>
+                    <button class="btn btn-info" onclick="testRealtimeSync()">
+                        <span>🔄</span> Test Real-Time Sync
+                    </button>
+                    <button class="btn btn-warning" onclick="testBoardIsolation()">
+                        <span>🎯</span> Test Board Isolation
+                    </button>
+                    <button class="btn btn-danger" onclick="resetDemo()">
+                        <span>🔄</span> Reset Demo
+                    </button>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>📊 Test Scenarios</h3>
+                <div class="button-group">
+                    <button class="btn btn-info" onclick="scenario1()">
+                        1️⃣ Alice Creates Ticket
+                    </button>
+                    <button class="btn btn-info" onclick="scenario2()">
+                        2️⃣ Bob Moves Card
+                    </button>
+                    <button class="btn btn-info" onclick="scenario3()">
+                        3️⃣ Charlie Updates
+                    </button>
+                    <button class="btn btn-info" onclick="scenario4()">
+                        4️⃣ Concurrent Actions
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Windows Simulation -->
+        <div class="windows-container" id="windowsContainer">
+            <!-- Windows will be dynamically added here -->
+        </div>
+
+        <!-- Status Dashboard -->
+        <div class="demo-status">
+            <h3>📊 Demo Status Dashboard</h3>
+            <div class="status-grid">
+                <div class="status-card">
+                    <div class="status-value" id="connectedUsers">0</div>
+                    <div class="status-label">Connected Users</div>
+                </div>
+                <div class="status-card">
+                    <div class="status-value" id="totalEvents">0</div>
+                    <div class="status-label">Total Events</div>
+                </div>
+                <div class="status-card">
+                    <div class="status-value" id="activeBoards">0</div>
+                    <div class="status-label">Active Boards</div>
+                </div>
+                <div class="status-card">
+                    <div class="status-value" id="syncStatus">✅</div>
+                    <div class="status-label">Sync Status</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // WebSocket connections storage
+        const connections = new Map();
+        let eventCount = 0;
+        let boardCount = new Set();
+
+        // User profiles
+        const users = [
+            { name: 'Alice', color: '#4299e1', avatar: 'A' },
+            { name: 'Bob', color: '#f6ad55', avatar: 'B' },
+            { name: 'Charlie', color: '#68d391', avatar: 'C' }
+        ];
+
+        // Create a simulated window
+        function createWindow(user, boardId = 1) {
+            const windowId = `window-${user.name}-${Date.now()}`;
+            const windowHtml = `
+                <div class="window-simulation" id="${windowId}">
+                    <div class="window-header">
+                        <div class="window-title">
+                            <span>🖥️ ${user.name}'s Browser</span>
+                            <div class="user-badge">
+                                <span class="connection-status status-disconnected" id="${windowId}-status"></span>
+                                <span>${user.name}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="window-body">
+                        <div class="board-selector">
+                            <select id="${windowId}-board" onchange="switchBoard('${windowId}', '${user.name}')">
+                                <option value="1">Board 1: Development Sprint</option>
+                                <option value="2">Board 2: Marketing Campaign</option>
+                                <option value="3">Board 3: Bug Tracking</option>
+                            </select>
+                        </div>
+                        <div class="event-log" id="${windowId}-log">
+                            <div class="event-entry event-system">🚀 Window ready - Click 'Connect' to start</div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="mini-btn" onclick="connectUser('${windowId}', '${user.name}')">🔗 Connect</button>
+                            <button class="mini-btn" onclick="createTicket('${windowId}', '${user.name}')">➕ Create Ticket</button>
+                            <button class="mini-btn" onclick="moveTicket('${windowId}', '${user.name}')">🔄 Move Card</button>
+                            <button class="mini-btn" onclick="clearLog('${windowId}')">🧹 Clear</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('windowsContainer').insertAdjacentHTML('beforeend', windowHtml);
+            return windowId;
+        }
+
+        // Connect user to WebSocket
+        async function connectUser(windowId, username) {
+            // Close existing connection if any
+            if (connections.has(windowId)) {
+                connections.get(windowId).close();
+            }
+
+            const boardSelect = document.getElementById(`${windowId}-board`);
+            const boardId = boardSelect.value;
+            const wsUrl = `ws://localhost:18000/ws/connect?username=${encodeURIComponent(username)}&board_id=${boardId}`;
+
+            logToWindow(windowId, `🔗 Connecting as ${username} to Board ${boardId}...`, 'system');
+
+            const ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                connections.set(windowId, ws);
+                document.getElementById(`${windowId}-status`).className = 'connection-status status-connected';
+                logToWindow(windowId, `✅ Connected to WebSocket`, 'system');
+                updateStatus();
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const message = JSON.parse(event.data);
+                    handleWebSocketMessage(windowId, username, message);
+                } catch (error) {
+                    console.error('Parse error:', error);
+                }
+            };
+
+            ws.onerror = (error) => {
+                logToWindow(windowId, `❌ Connection error`, 'system');
+            };
+
+            ws.onclose = () => {
+                connections.delete(windowId);
+                document.getElementById(`${windowId}-status`).className = 'connection-status status-disconnected';
+                logToWindow(windowId, `❌ Disconnected`, 'system');
+                updateStatus();
+            };
+        }
+
+        // Handle WebSocket messages
+        function handleWebSocketMessage(windowId, username, message) {
+            // Skip heartbeats
+            if (message.event === 'heartbeat') return;
+
+            eventCount++;
+            updateStatus();
+
+            if (message.event === 'connected') {
+                logToWindow(windowId, `👤 Authenticated as: ${message.data.username}`, 'own');
+                if (message.data.board_id) {
+                    boardCount.add(message.data.board_id);
+                }
+            } else if (message.event === 'ticket_created') {
+                const isOwn = message.data.created_by === username;
+                logToWindow(windowId,
+                    `📝 ${message.data.created_by || 'Someone'} created "${message.data.title}"`,
+                    isOwn ? 'own' : 'other'
+                );
+            } else if (message.event === 'ticket_moved') {
+                const isOwn = message.data.moved_by === username;
+                logToWindow(windowId,
+                    `🔄 ${message.data.moved_by || 'Someone'} moved ticket to "${message.data.to_column}"`,
+                    isOwn ? 'own' : 'other'
+                );
+            } else if (message.event === 'ticket_updated') {
+                const isOwn = message.data.changed_by === username;
+                logToWindow(windowId,
+                    `✏️ ${message.data.changed_by || 'Someone'} updated ticket #${message.data.id}`,
+                    isOwn ? 'own' : 'other'
+                );
+            } else if (message.event === 'board_created' || message.event === 'board_updated') {
+                logToWindow(windowId, `📊 Board event: ${message.event}`, 'system');
+            }
+        }
+
+        // Log message to window
+        function logToWindow(windowId, message, type = 'system') {
+            const log = document.getElementById(`${windowId}-log`);
+            if (!log) return;
+
+            const entry = document.createElement('div');
+            entry.className = `event-entry event-${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+
+            // Highlight effect
+            entry.classList.add('highlight');
+        }
+
+        // Clear log
+        function clearLog(windowId) {
+            const log = document.getElementById(`${windowId}-log`);
+            if (log) {
+                log.innerHTML = '<div class="event-entry event-system">📋 Log cleared</div>';
+            }
+        }
+
+        // Switch board
+        function switchBoard(windowId, username) {
+            const boardSelect = document.getElementById(`${windowId}-board`);
+            const newBoardId = boardSelect.value;
+
+            logToWindow(windowId, `🔄 Switching to Board ${newBoardId}...`, 'system');
+
+            // Reconnect with new board
+            connectUser(windowId, username);
+        }
+
+        // Create ticket
+        async function createTicket(windowId, username) {
+            const boardSelect = document.getElementById(`${windowId}-board`);
+            const boardId = boardSelect.value;
+
+            logToWindow(windowId, `➕ Creating ticket...`, 'own');
+
+            try {
+                const response = await fetch('http://localhost:18000/api/tickets/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: `${username}'s Task ${Date.now().toString().slice(-4)}`,
+                        description: `Created by ${username} in demo`,
+                        board_id: parseInt(boardId),
+                        current_column: 'Not Started',
+                        created_by: username
+                    })
+                });
+
+                if (response.ok) {
+                    const ticket = await response.json();
+                    logToWindow(windowId, `✅ Created ticket #${ticket.id}`, 'own');
+
+                    // Store for later actions
+                    window.lastTicketId = ticket.id;
+                } else {
+                    logToWindow(windowId, `❌ Failed to create ticket`, 'system');
+                }
+            } catch (error) {
+                logToWindow(windowId, `❌ Error: ${error.message}`, 'system');
+            }
+        }
+
+        // Move ticket
+        async function moveTicket(windowId, username) {
+            if (!window.lastTicketId) {
+                logToWindow(windowId, `⚠️ No ticket to move. Create one first!`, 'system');
+                return;
+            }
+
+            logToWindow(windowId, `🔄 Moving ticket...`, 'own');
+
+            const columns = ['Not Started', 'In Progress', 'Ready for QC', 'Done'];
+            const randomColumn = columns[Math.floor(Math.random() * columns.length)];
+
+            try {
+                const response = await fetch(`http://localhost:18000/api/tickets/${window.lastTicketId}/move`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        column: randomColumn,
+                        moved_by: username
+                    })
+                });
+
+                if (response.ok) {
+                    logToWindow(windowId, `✅ Moved to "${randomColumn}"`, 'own');
+                } else {
+                    logToWindow(windowId, `❌ Failed to move ticket`, 'system');
+                }
+            } catch (error) {
+                logToWindow(windowId, `❌ Error: ${error.message}`, 'system');
+            }
+        }
+
+        // Update status dashboard
+        function updateStatus() {
+            document.getElementById('connectedUsers').textContent = connections.size;
+            document.getElementById('totalEvents').textContent = eventCount;
+            document.getElementById('activeBoards').textContent = boardCount.size;
+            document.getElementById('syncStatus').textContent = connections.size > 0 ? '✅' : '❌';
+        }
+
+        // Demo scenarios
+        function startFullDemo() {
+            openMultipleWindows();
+            setTimeout(() => {
+                // Connect all users
+                const windows = document.querySelectorAll('.window-simulation');
+                windows.forEach((window, index) => {
+                    setTimeout(() => {
+                        const windowId = window.id;
+                        const username = users[index].name;
+                        connectUser(windowId, username);
+                    }, index * 1000);
+                });
+
+                // Run test scenarios
+                setTimeout(() => testRealtimeSync(), 4000);
+                setTimeout(() => testBoardIsolation(), 8000);
+            }, 1000);
+        }
+
+        function openMultipleWindows() {
+            document.getElementById('windowsContainer').innerHTML = '';
+            users.forEach((user, index) => {
+                setTimeout(() => {
+                    createWindow(user, index === 2 ? 2 : 1); // Charlie on board 2
+                }, index * 200);
+            });
+        }
+
+        async function testRealtimeSync() {
+            const windows = Array.from(document.querySelectorAll('.window-simulation'));
+            if (windows.length < 2) {
+                alert('Please open multiple windows first!');
+                return;
+            }
+
+            // Alice creates a ticket
+            const aliceWindow = windows[0].id;
+            await createTicket(aliceWindow, 'Alice');
+
+            // Bob moves it after 2 seconds
+            setTimeout(async () => {
+                const bobWindow = windows[1].id;
+                await moveTicket(bobWindow, 'Bob');
+            }, 2000);
+        }
+
+        async function testBoardIsolation() {
+            const windows = Array.from(document.querySelectorAll('.window-simulation'));
+            if (windows.length < 3) {
+                alert('Please open 3 windows first!');
+                return;
+            }
+
+            // Put Charlie on board 2
+            const charlieWindow = windows[2].id;
+            document.getElementById(`${charlieWindow}-board`).value = '2';
+            await connectUser(charlieWindow, 'Charlie');
+
+            // Charlie creates ticket on board 2
+            setTimeout(() => {
+                createTicket(charlieWindow, 'Charlie');
+            }, 1000);
+
+            // Alice creates ticket on board 1
+            setTimeout(() => {
+                const aliceWindow = windows[0].id;
+                createTicket(aliceWindow, 'Alice');
+            }, 2000);
+        }
+
+        function scenario1() {
+            const windows = Array.from(document.querySelectorAll('.window-simulation'));
+            if (windows.length > 0) {
+                createTicket(windows[0].id, 'Alice');
+            }
+        }
+
+        function scenario2() {
+            const windows = Array.from(document.querySelectorAll('.window-simulation'));
+            if (windows.length > 1) {
+                moveTicket(windows[1].id, 'Bob');
+            }
+        }
+
+        function scenario3() {
+            const windows = Array.from(document.querySelectorAll('.window-simulation'));
+            if (windows.length > 2) {
+                createTicket(windows[2].id, 'Charlie');
+            }
+        }
+
+        async function scenario4() {
+            const windows = Array.from(document.querySelectorAll('.window-simulation'));
+            // All users create tickets simultaneously
+            windows.forEach((window, index) => {
+                if (index < users.length) {
+                    createTicket(window.id, users[index].name);
+                }
+            });
+        }
+
+        function resetDemo() {
+            // Close all connections
+            connections.forEach(ws => ws.close());
+            connections.clear();
+
+            // Reset counters
+            eventCount = 0;
+            boardCount.clear();
+            window.lastTicketId = null;
+
+            // Clear UI
+            document.getElementById('windowsContainer').innerHTML = '';
+            updateStatus();
+
+            // Restart
+            setTimeout(() => openMultipleWindows(), 500);
+        }
+
+        // Initialize on load
+        window.onload = () => {
+            updateStatus();
+        };
+
+        // Cleanup on unload
+        window.onbeforeunload = () => {
+            connections.forEach(ws => ws.close());
+        };
+    </script>
+</body>
+</html>

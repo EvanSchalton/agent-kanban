@@ -1,0 +1,787 @@
+{
+  "config": {
+    "users": 20,
+    "tasks": 500,
+    "board_id": 1
+  },
+  "results": {
+    "total_time": 527.2448754310608,
+    "tasks_created": 493,
+    "success_rate": 98.6,
+    "throughput": 0.9350493916075274,
+    "total_operations": 773,
+    "error_count": 157
+  },
+  "performance": {
+    "create_ticket": {
+      "count": 493,
+      "min": 84.77139472961426,
+      "max": 150560.92977523804,
+      "mean": 7139.5167936901535,
+      "median": 371.3686466217041,
+      "p95": 60539.530992507935,
+      "p99": 150512.4635696411
+    },
+    "get_tickets": {
+      "count": 180,
+      "min": 37.786006927490234,
+      "max": 1026.6311168670654,
+      "mean": 340.20803504519995,
+      "median": 326.52246952056885,
+      "p95": 674.7481822967529,
+      "p99": 923.8829612731934
+    }
+  },
+  "errors": [
+    {
+      "operation": "create_ticket",
+      "status": 500,
+      "error": "Internal Server Error",
+      "user": 18,
+      "task": 450
+    },
+    {
+      "operation": "create_ticket",
+      "status": 500,
+      "error": "Internal Server Error",
+      "user": 6,
+      "task": 150
+    },
+    {
+      "operation": "create_ticket",
+      "status": 500,
+      "error": "Internal Server Error",
+      "user": 17,
+      "task": 425
+    },
+    {
+      "operation": "create_ticket",
+      "status": 500,
+      "error": "Internal Server Error",
+      "user": 15,
+      "task": 375
+    },
+    {
+      "operation": "create_ticket",
+      "status": 500,
+      "error": "Internal Server Error",
+      "user": 14,
+      "task": 350
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 84
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 78
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 73
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 81
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 79
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 82
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 82
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 77
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 73
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 79
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 74
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 72
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 74
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 78
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 80
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 74
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 74
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 73
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 78
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 82
+    },
+    {
+      "operation": "create_ticket",
+      "status": 500,
+      "error": "Internal Server Error",
+      "user": 7,
+      "task": 178
+    },
+    {
+      "operation": "create_ticket",
+      "status": 500,
+      "error": "Internal Server Error",
+      "user": 11,
+      "task": 278
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 156
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 113
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 127
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 127
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 159
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 114
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 101
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 93
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 111
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 77
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 99
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 133
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 121
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 75
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 131
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 165
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 121
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 123
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 149
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 175
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 173
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 228
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 241
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 188
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 144
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 108
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 73
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 89
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 110
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 175
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 255
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 103
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 261
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 106
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 126
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 208
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 218
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 239
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 101
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 269
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 179
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 274
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 119
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 154
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 261
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 347
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 358
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 265
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 318
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 361
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 200
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 79
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 104
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 249
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 151
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 233
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 229
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 231
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 316
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 71
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 376
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 392
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 106
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 109
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 117
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 267
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 456
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 262
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 403
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 373
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 318
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 437
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 390
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 473
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 320
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 271
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 199
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 447
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 425
+    },
+    {
+      "operation": "move_ticket",
+      "status": 405,
+      "ticket_id": 181
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    },
+    {
+      "operation": "get_tickets",
+      "error": ""
+    }
+  ],
+  "timestamp": "2025-08-10T22:45:38.912086"
+}

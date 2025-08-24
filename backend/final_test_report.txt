@@ -1,0 +1,83 @@
+=== FINAL TEST REPORT ===
+Mon Aug 18 05:29:49 UTC 2025
+
+....................F......F.F.......F...........FFFFF....F...F.F.....FF [ 69%]
+FFF.FF..FF.F...................F                                         [100%]
+=============================== warnings summary ===============================
+../../../usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: 12 warnings
+  /usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+../../../usr/local/lib/python3.11/site-packages/passlib/utils/__init__.py:854
+  /usr/local/lib/python3.11/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+../../../usr/local/lib/python3.11/site-packages/pydantic/fields.py:1062
+../../../usr/local/lib/python3.11/site-packages/pydantic/fields.py:1062
+../../../usr/local/lib/python3.11/site-packages/pydantic/fields.py:1062
+  /usr/local/lib/python3.11/site-packages/pydantic/fields.py:1062: PydanticDeprecatedSince20: `min_items` is deprecated and will be removed, use `min_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warn('`min_items` is deprecated and will be removed, use `min_length` instead', DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_api_integration.py::TestLoadPreparation::test_api_performance_baseline
+FAILED tests/test_bulk_operations.py::TestBulkOperations::test_bulk_operations_rate_limiting
+FAILED tests/test_bulk_operations.py::TestBulkOperations::test_bulk_operation_performance
+FAILED tests/test_drag_drop_logging.py::TestLogDragDropOperationDecorator::test_decorator_with_sync_function
+FAILED tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_ticket_color_classifications
+FAILED tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_realtime_ticket_colors
+FAILED tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_realtime_ticket_colors_limits
+FAILED tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_column_statistics
+FAILED tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_column_statistics_not_found
+FAILED tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_performance_metrics
+FAILED tests/test_error_handlers.py::TestErrorHandlers::test_general_exception_handler
+FAILED tests/test_error_handlers.py::TestRequestLoggingMiddleware::test_error_request_logging
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_ticket_history_success
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_ticket_history_not_found
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_ticket_history_with_field_filter
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_ticket_transitions
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_board_activity
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_board_activity_no_tickets
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_history_statistics
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_history_endpoint_error_handling
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_history_pagination
+FAILED tests/test_statistics_service.py::TestStatisticsService::test_calculate_ticket_statistics
+FAILED tests/test_websocket_manager.py::TestConnectionManager::test_broadcast_to_board
+23 failed, 81 passed, 16 warnings in 32.83s
+
+=== CATEGORY BREAKDOWN ===
+Bulk Operations:
+........F                                                                [100%]
+=========================== short test summary info ============================
+FAILED tests/test_bulk_operations.py::TestBulkOperations::test_bulk_operation_performance
+1 failed, 8 passed in 2.62s
+
+History Endpoints:
+FFFFF.FF..FF                                                             [100%]
+=============================== warnings summary ===============================
+../../../usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: 12 warnings
+  /usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+../../../usr/local/lib/python3.11/site-packages/passlib/utils/__init__.py:854
+  /usr/local/lib/python3.11/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+../../../usr/local/lib/python3.11/site-packages/pydantic/fields.py:1062
+../../../usr/local/lib/python3.11/site-packages/pydantic/fields.py:1062
+../../../usr/local/lib/python3.11/site-packages/pydantic/fields.py:1062
+  /usr/local/lib/python3.11/site-packages/pydantic/fields.py:1062: PydanticDeprecatedSince20: `min_items` is deprecated and will be removed, use `min_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warn('`min_items` is deprecated and will be removed, use `min_length` instead', DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_ticket_history_success
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_ticket_history_not_found
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_ticket_history_with_field_filter
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_ticket_transitions
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_board_activity
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_board_activity_no_tickets
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_history_statistics
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_history_endpoint_error_handling
+FAILED tests/test_history_endpoints.py::TestHistoryEndpoints::test_history_pagination
+9 failed, 3 passed, 16 warnings in 10.94s

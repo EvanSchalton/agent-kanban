@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA: Card Creation UI Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .status.success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .status.error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .status.info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover { background: #005a9e; }
+        .add-card-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .console-log {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .test-results {
+            margin-top: 20px;
+        }
+        h1 { color: #2d3748; border-bottom: 2px solid #007acc; padding-bottom: 10px; }
+        h2 { color: #4a5568; margin-top: 25px; }
+    </style>
+</head>
+<body>
+    <h1>🐛 QA: P2 Card Creation Bug Investigation</h1>
+
+    <div class="test-container">
+        <h2>📋 Issue Description</h2>
+        <div class="status info">
+            <strong>P2 Bug:</strong> "Method not allowed" error when clicking + button to add cards
+            <br><strong>Investigation:</strong> Testing frontend payload format and API endpoint configuration
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🧪 Test Card Creation Form</h2>
+        <div class="add-card-form">
+            <div class="form-group">
+                <label for="title">Card Title *</label>
+                <input type="text" id="title" value="QA Test Card - Frontend Bug">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" rows="3">Testing card creation through frontend to debug Method Not Allowed error</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="column">Column</label>
+                <select id="column">
+                    <option value="not_started">Not Started</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="blocked">Blocked</option>
+                    <option value="ready_for_qc">Ready for QC</option>
+                    <option value="done">Done</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="boardId">Board ID</label>
+                <select id="boardId">
+                    <option value="1">Board 1 - WebSocket Test Board</option>
+                    <option value="2">Board 2 - QA Test Board 2</option>
+                    <option value="3">Board 3 - QA Test Board 3</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="priority">Priority</label>
+                <select id="priority">
+                    <option value="Low">Low</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+
+            <button onclick="testDirectAPI()">Test Direct API (Port 18000)</button>
+            <button onclick="testProxiedAPI()">Test Proxied API (Via Frontend Port)</button>
+            <button onclick="testFrontendFormat()">Test Frontend Payload Format</button>
+            <button onclick="runAllTests()">Run All Tests</button>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>📊 Test Results</h2>
+        <div id="testResults" class="test-results">
+            <div class="status info">No tests run yet...</div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🖥️ Console Log</h2>
+        <button onclick="clearLogs()">Clear Logs</button>
+        <div id="consoleLog" class="console-log">
+            Waiting for test execution...
+        </div>
+    </div>
+
+    <script>
+        // Column mapping (frontend to backend)
+        const COLUMN_MAP = {
+            'not_started': 'Not Started',
+            'in_progress': 'In Progress',
+            'blocked': 'Blocked',
+            'ready_for_qc': 'Ready for QC',
+            'done': 'Done'
+        };
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+            const logDiv = document.getElementById('consoleLog');
+            const color = type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#3b82f6');
+            logDiv.innerHTML += `<div style="color: ${color};">[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(`[${type.toUpperCase()}]`, message);
+        }
+
+        function addResult(testName, status, details) {
+            const resultsDiv = document.getElementById('testResults');
+            const statusClass = status === 'PASS' ? 'success' : (status === 'FAIL' ? 'error' : 'info');
+            const statusIcon = status === 'PASS' ? '✅' : (status === 'FAIL' ? '❌' : 'ℹ️');
+
+            resultsDiv.innerHTML += `
+                <div class="status ${statusClass}">
+                    ${statusIcon} <strong>${testName}:</strong> ${status}
+                    ${details ? `<br><small>${details}</small>` : ''}
+                </div>
+            `;
+        }
+
+        function clearLogs() {
+            document.getElementById('consoleLog').innerHTML = 'Logs cleared...';
+        }
+
+        function getFormData() {
+            const columnId = document.getElementById('column').value;
+            const columnName = COLUMN_MAP[columnId];
+
+            return {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                column_id: columnId,
+                current_column: columnName,
+                board_id: parseInt(document.getElementById('boardId').value),
+                priority: document.getElementById('priority').value
+            };
+        }
+
+        async function testDirectAPI() {
+            const data = getFormData();
+            const payload = {
+                title: data.title,
+                description: data.description,
+                current_column: data.current_column,
+                board_id: data.board_id,
+                priority: data.priority
+            };
+
+            log('🚀 Testing Direct API to port 18000...');
+            log(`URL: http://localhost:18000/api/tickets/`);
+            log(`Payload: ${JSON.stringify(payload, null, 2)}`);
+
+            try {
+                const response = await fetch('http://localhost:18000/api/tickets/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const responseData = await response.json();
+
+                if (response.ok) {
+                    log(`✅ Success! Status: ${response.status}`, 'success');
+                    log(`Response: ${JSON.stringify(responseData, null, 2)}`, 'success');
+                    addResult('Direct API Test', 'PASS', `Card created with ID: ${responseData.id}`);
+                } else {
+                    log(`❌ Failed! Status: ${response.status}`, 'error');
+                    log(`Error: ${JSON.stringify(responseData)}`, 'error');
+                    addResult('Direct API Test', 'FAIL', `HTTP ${response.status}: ${responseData.detail || responseData.message}`);
+                }
+            } catch (error) {
+                log(`❌ Network error: ${error.message}`, 'error');
+                addResult('Direct API Test', 'FAIL', `Network error: ${error.message}`);
+            }
+        }
+
+        async function testProxiedAPI() {
+            const data = getFormData();
+            const payload = {
+                title: data.title,
+                description: data.description,
+                current_column: data.current_column,
+                board_id: data.board_id,
+                priority: data.priority
+            };
+
+            log('🚀 Testing Proxied API via frontend port...');
+            log(`URL: /api/tickets/ (should proxy to port 18000)`);
+            log(`Payload: ${JSON.stringify(payload, null, 2)}`);
+
+            try {
+                const response = await fetch('/api/tickets/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const responseData = await response.json();
+
+                if (response.ok) {
+                    log(`✅ Success! Status: ${response.status}`, 'success');
+                    log(`Response: ${JSON.stringify(responseData, null, 2)}`, 'success');
+                    addResult('Proxied API Test', 'PASS', `Card created with ID: ${responseData.id}`);
+                } else {
+                    log(`❌ Failed! Status: ${response.status}`, 'error');
+                    log(`Error: ${JSON.stringify(responseData)}`, 'error');
+                    addResult('Proxied API Test', 'FAIL', `HTTP ${response.status}: ${responseData.detail || responseData.message}`);
+                }
+            } catch (error) {
+                log(`❌ Network error: ${error.message}`, 'error');
+                addResult('Proxied API Test', 'FAIL', `Network error: ${error.message}`);
+            }
+        }
+
+        async function testFrontendFormat() {
+            const data = getFormData();
+
+            // This mimics what the frontend actually sends (from api.ts)
+            const frontendPayload = {
+                title: data.title,
+                description: data.description,
+                acceptance_criteria: undefined,
+                priority: data.priority,
+                assignee: undefined,
+                board_id: data.board_id,
+                current_column: data.current_column
+            };
+
+            log('🚀 Testing with exact frontend payload format...');
+            log(`URL: http://localhost:18000/api/tickets/`);
+            log(`Frontend-style Payload: ${JSON.stringify(frontendPayload, null, 2)}`);
+
+            try {
+                const response = await fetch('http://localhost:18000/api/tickets/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(frontendPayload)
+                });
+
+                const responseData = await response.json();
+
+                if (response.ok) {
+                    log(`✅ Success! Status: ${response.status}`, 'success');
+                    log(`Response: ${JSON.stringify(responseData, null, 2)}`, 'success');
+                    addResult('Frontend Format Test', 'PASS', `Card created with ID: ${responseData.id}`);
+                } else {
+                    log(`❌ Failed! Status: ${response.status}`, 'error');
+                    log(`Error: ${JSON.stringify(responseData)}`, 'error');
+                    addResult('Frontend Format Test', 'FAIL', `HTTP ${response.status}: ${responseData.detail || responseData.message}`);
+                }
+            } catch (error) {
+                log(`❌ Network error: ${error.message}`, 'error');
+                addResult('Frontend Format Test', 'FAIL', `Network error: ${error.message}`);
+            }
+        }
+
+        async function runAllTests() {
+            document.getElementById('testResults').innerHTML = '';
+            log('🔄 Running all tests...', 'info');
+
+            await testDirectAPI();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            await testProxiedAPI();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            await testFrontendFormat();
+
+            log('✅ All tests completed!', 'success');
+        }
+
+        // Test API endpoints on page load
+        window.addEventListener('load', async () => {
+            log('🔍 Checking API endpoints...', 'info');
+
+            // Test health endpoint
+            try {
+                const health = await fetch('http://localhost:18000/health');
+                const healthData = await health.json();
+                log(`✅ Backend health: ${JSON.stringify(healthData)}`, 'success');
+            } catch (error) {
+                log(`❌ Backend not responding on port 18000: ${error.message}`, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

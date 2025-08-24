@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Sync QA Validation</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { border: 1px solid #ccc; margin: 10px 0; padding: 15px; }
+        .status { font-weight: bold; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        #log { height: 300px; overflow-y: scroll; border: 1px solid #333; padding: 10px; background: #f5f5f5; }
+        button { margin: 5px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🔄 Real-time Sync QA Validation Dashboard</h1>
+
+    <div class="test-section">
+        <h3>1. Multi-user Board Access Test</h3>
+        <button onclick="testBoardAccess()">Test Board Access</button>
+        <div id="board-status" class="status">Ready to test</div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. WebSocket Connection Test</h3>
+        <button onclick="connectWebSocket()">Connect WebSocket</button>
+        <button onclick="disconnectWebSocket()">Disconnect</button>
+        <div id="ws-status" class="status">Not connected</div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Card Creation Broadcasting Test</h3>
+        <button onclick="createTestCard()">Create Test Card</button>
+        <button onclick="listenForCards()">Listen for Card Events</button>
+        <div id="card-status" class="status">Ready to test</div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Card Movement Test</h3>
+        <button onclick="moveTestCard()">Move Card</button>
+        <div id="move-status" class="status">Ready to test</div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Test Log</h3>
+        <button onclick="clearLog()">Clear Log</button>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        let socket = null;
+        let testResults = {
+            boardAccess: false,
+            websocketConnection: false,
+            cardBroadcasting: false,
+            cardMovement: false,
+            connectionStability: false
+        };
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = type;
+            entry.innerHTML = `[${timestamp}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(`[QA-REALTIME] ${message}`);
+        }
+
+        function updateStatus(elementId, message, success = null) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = 'status ' + (success === true ? 'success' : success === false ? 'error' : 'info');
+        }
+
+        async function testBoardAccess() {
+            log('🔍 Testing board access...', 'info');
+            updateStatus('board-status', 'Testing...', null);
+
+            try {
+                const response = await fetch('/api/boards/');
+                if (response.ok) {
+                    const boards = await response.json();
+                    testResults.boardAccess = true;
+                    updateStatus('board-status', `✅ Success: ${boards.length} boards accessible`, true);
+                    log(`✅ Board access successful: ${boards.length} boards found`, 'success');
+                    return boards;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                testResults.boardAccess = false;
+                updateStatus('board-status', `❌ Failed: ${error.message}`, false);
+                log(`❌ Board access failed: ${error.message}`, 'error');
+            }
+        }
+
+        function connectWebSocket() {
+            log('🔌 Connecting to WebSocket...', 'info');
+            updateStatus('ws-status', 'Connecting...', null);
+
+            try {
+                socket = io('http://localhost:8000', {
+                    transports: ['websocket', 'polling'],
+                    timeout: 5000
+                });
+
+                socket.on('connect', () => {
+                    testResults.websocketConnection = true;
+                    updateStatus('ws-status', '✅ Connected', true);
+                    log('✅ WebSocket connected successfully', 'success');
+
+                    // Join board room for testing
+                    socket.emit('join_board', { board_id: 1, username: 'QA-Validator' });
+                    log('📡 Joined board 1 room', 'info');
+                });
+
+                socket.on('disconnect', () => {
+                    testResults.websocketConnection = false;
+                    updateStatus('ws-status', '❌ Disconnected', false);
+                    log('❌ WebSocket disconnected', 'error');
+                });
+
+                socket.on('connect_error', (error) => {
+                    testResults.websocketConnection = false;
+                    updateStatus('ws-status', `❌ Connection Error: ${error.message}`, false);
+                    log(`❌ WebSocket connection error: ${error.message}`, 'error');
+                });
+
+                socket.on('ticket_created', (data) => {
+                    log(`📨 Received ticket_created event: ${JSON.stringify(data)}`, 'success');
+                    updateStatus('card-status', '✅ Card creation event received', true);
+                });
+
+                socket.on('ticket_moved', (data) => {
+                    log(`📨 Received ticket_moved event: ${JSON.stringify(data)}`, 'success');
+                    updateStatus('move-status', '✅ Card movement event received', true);
+                });
+
+            } catch (error) {
+                testResults.websocketConnection = false;
+                updateStatus('ws-status', `❌ Failed: ${error.message}`, false);
+                log(`❌ WebSocket connection failed: ${error.message}`, 'error');
+            }
+        }
+
+        function disconnectWebSocket() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+                updateStatus('ws-status', 'Disconnected', null);
+                log('🔌 WebSocket disconnected manually', 'info');
+            }
+        }
+
+        async function createTestCard() {
+            if (!testResults.websocketConnection) {
+                log('❌ WebSocket not connected. Connect first.', 'error');
+                return;
+            }
+
+            log('🎯 Creating test card for broadcasting validation...', 'info');
+            updateStatus('card-status', 'Creating test card...', null);
+
+            try {
+                const cardData = {
+                    title: `QA Real-time Test Card ${Date.now()}`,
+                    description: 'Testing real-time broadcasting',
+                    current_column: 'Not Started',
+                    priority: 'high',
+                    board_id: 1
+                };
+
+                const response = await fetch('/api/tickets/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(cardData)
+                });
+
+                if (response.ok) {
+                    const card = await response.json();
+                    log(`✅ Card created successfully: ID ${card.id}`, 'success');
+                    // WebSocket event should be received automatically
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                updateStatus('card-status', `❌ Card creation failed: ${error.message}`, false);
+                log(`❌ Card creation failed: ${error.message}`, 'error');
+            }
+        }
+
+        function listenForCards() {
+            if (!socket) {
+                log('❌ WebSocket not connected', 'error');
+                return;
+            }
+
+            log('👂 Listening for card events...', 'info');
+            updateStatus('card-status', 'Listening for events...', null);
+        }
+
+        async function moveTestCard() {
+            log('🔄 Testing card movement...', 'info');
+            updateStatus('move-status', 'Testing card movement...', null);
+
+            try {
+                // Get a card to move
+                const response = await fetch('/api/tickets/?board_id=1&page_size=1');
+                if (!response.ok) throw new Error('Failed to get cards');
+
+                const data = await response.json();
+                if (data.items.length === 0) {
+                    throw new Error('No cards available to move');
+                }
+
+                const card = data.items[0];
+                const newColumn = card.current_column === 'Not Started' ? 'In Progress' : 'Not Started';
+
+                const moveResponse = await fetch(`/api/tickets/${card.id}/move`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        current_column: newColumn,
+                        position: 0
+                    })
+                });
+
+                if (moveResponse.ok) {
+                    log(`✅ Card moved: ${card.title} → ${newColumn}`, 'success');
+                    // WebSocket event should be received
+                } else {
+                    throw new Error(`HTTP ${moveResponse.status}`);
+                }
+            } catch (error) {
+                updateStatus('move-status', `❌ Move failed: ${error.message}`, false);
+                log(`❌ Card movement failed: ${error.message}`, 'error');
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        // Auto-start validation sequence
+        window.addEventListener('load', () => {
+            log('🚀 QA Real-time Sync Validation Dashboard loaded', 'info');
+            log('📋 Test sequence: 1) Board Access 2) WebSocket 3) Card Events 4) Movement', 'info');
+
+            // Auto-test board access
+            setTimeout(testBoardAccess, 1000);
+        });
+
+        // Generate periodic status reports
+        setInterval(() => {
+            const summary = {
+                timestamp: new Date().toISOString(),
+                boardAccess: testResults.boardAccess,
+                websocketConnection: testResults.websocketConnection,
+                cardBroadcasting: testResults.cardBroadcasting,
+                cardMovement: testResults.cardMovement
+            };
+            log(`📊 Status Summary: ${JSON.stringify(summary)}`, 'info');
+        }, 60000); // Every minute
+    </script>
+</body>
+</html>

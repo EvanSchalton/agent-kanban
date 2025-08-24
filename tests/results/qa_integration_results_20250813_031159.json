@@ -1,0 +1,45 @@
+{
+  "timestamp": "2025-08-13T03:11:59.508861",
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "success_rate": 100.0
+  },
+  "results": [
+    {
+      "test": "Backend Health Check",
+      "status": "PASS",
+      "message": {
+        "status": "healthy",
+        "socketio": "available",
+        "cors": "enabled"
+      }
+    },
+    {
+      "test": "Boards API Integration",
+      "status": "PASS",
+      "message": "Found 20 boards"
+    },
+    {
+      "test": "Tickets API Integration",
+      "status": "PASS",
+      "message": "Found 7 tickets"
+    },
+    {
+      "test": "MCP Tools Integration",
+      "status": "PASS",
+      "message": "MCP integration working: 7 tasks accessible"
+    },
+    {
+      "test": "Ticket Creation",
+      "status": "PASS",
+      "message": "Created ticket ID: 570"
+    },
+    {
+      "test": "WebSocket Connectivity",
+      "status": "PASS",
+      "message": "WebSocket endpoint available (expected HTTP error)"
+    }
+  ]
+}

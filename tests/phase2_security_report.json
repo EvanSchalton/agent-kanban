@@ -1,0 +1,87 @@
+{
+  "summary": {
+    "total_tests": 29,
+    "passed": 11,
+    "failed": 12,
+    "warnings": 2
+  },
+  "vulnerabilities": {
+    "critical": 2,
+    "high": 10,
+    "medium": 1,
+    "low": 1,
+    "total": 14
+  },
+  "details": [
+    {
+      "test": "Auth Endpoint /api/auth/login",
+      "severity": "HIGH",
+      "details": "Endpoint not found"
+    },
+    {
+      "test": "Auth Endpoint /api/auth/signup",
+      "severity": "HIGH",
+      "details": "Endpoint not found"
+    },
+    {
+      "test": "Auth Endpoint /api/auth/logout",
+      "severity": "HIGH",
+      "details": "Endpoint not found"
+    },
+    {
+      "test": "Auth Endpoint /api/auth/refresh",
+      "severity": "HIGH",
+      "details": "Endpoint not found"
+    },
+    {
+      "test": "Auth Endpoint /api/users/me",
+      "severity": "HIGH",
+      "details": "Endpoint not found"
+    },
+    {
+      "test": "Authentication System",
+      "severity": "CRITICAL",
+      "details": "No authentication endpoints found - system is unprotected!"
+    },
+    {
+      "test": "Endpoint Protection /api/boards/",
+      "severity": "HIGH",
+      "details": "Endpoint accessible without auth"
+    },
+    {
+      "test": "Endpoint Protection /api/tickets/",
+      "severity": "HIGH",
+      "details": "Endpoint accessible without auth"
+    },
+    {
+      "test": "Endpoint Protection /api/boards/1",
+      "severity": "HIGH",
+      "details": "Endpoint accessible without auth"
+    },
+    {
+      "test": "Endpoint Protection /api/tickets/1",
+      "severity": "HIGH",
+      "details": "Endpoint accessible without auth"
+    },
+    {
+      "test": "API Protection",
+      "severity": "CRITICAL",
+      "details": "4 endpoints are unprotected: /api/boards/, /api/tickets/, /api/boards/1, /api/tickets/1"
+    },
+    {
+      "test": "JWT Validation",
+      "severity": "MEDIUM",
+      "details": "Unexpected response: 404"
+    },
+    {
+      "test": "Rate Limiting",
+      "severity": "HIGH",
+      "details": "No rate limiting after 20 attempts in 0.1s"
+    },
+    {
+      "test": "Header Disclosure",
+      "severity": "LOW",
+      "details": "Server header exposed: uvicorn"
+    }
+  ]
+}

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Card Creation Issue</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-box { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+        .error { color: red; }
+        .success { color: green; }
+        button { margin: 5px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Frontend Card Creation Debug</h1>
+
+    <div class="test-box">
+        <h2>Test 1: Direct API Call (Working)</h2>
+        <button onclick="testDirectAPI()">Test Direct API</button>
+        <div id="direct-result"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 2: Frontend API Module</h2>
+        <button onclick="testFrontendAPI()">Test Frontend API</button>
+        <div id="frontend-result"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 3: Payload Debug</h2>
+        <button onclick="debugPayload()">Debug Payload</button>
+        <div id="payload-result"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 4: Board ID Validation</h2>
+        <button onclick="testBoardValidation()">Test Board ID</button>
+        <div id="board-result"></div>
+    </div>
+
+    <script>
+        async function testDirectAPI() {
+            const result = document.getElementById('direct-result');
+            try {
+                const response = await fetch('/api/tickets/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: 'Direct API Test',
+                        description: 'Testing direct API call',
+                        board_id: 1,
+                        current_column: 'Not Started'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    result.innerHTML = `<div class="success">✅ Success: ${JSON.stringify(data, null, 2)}</div>`;
+                } else {
+                    const error = await response.text();
+                    result.innerHTML = `<div class="error">❌ Failed: ${response.status} - ${error}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function testFrontendAPI() {
+            const result = document.getElementById('frontend-result');
+            try {
+                // Simulate frontend API call
+                const payload = {
+                    title: 'Frontend API Test',
+                    description: 'Testing frontend API module',
+                    acceptance_criteria: null,
+                    priority: '1.0',
+                    assignee: null,
+                    board_id: parseInt('1' || '0'),  // This is the frontend logic
+                    current_column: 'Not Started'
+                };
+
+                console.log('📤 Frontend payload:', payload);
+
+                const response = await fetch('/api/tickets/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    result.innerHTML = `<div class="success">✅ Success: ${JSON.stringify(data, null, 2)}</div>`;
+                } else {
+                    const error = await response.text();
+                    result.innerHTML = `<div class="error">❌ Failed: ${response.status} - ${error}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        function debugPayload() {
+            const result = document.getElementById('payload-result');
+
+            // Simulate exact frontend payload creation
+            const ticket = {
+                title: 'Test Card',
+                description: 'Test description',
+                acceptance_criteria: undefined,
+                priority: 'medium',
+                assignee: undefined,
+                column_id: 'not_started',
+                board_id: '1'  // This comes as string from context
+            };
+
+            // Frontend transformation logic
+            const COLUMN_MAP = {
+                'not_started': 'Not Started',
+                'in_progress': 'In Progress',
+                'blocked': 'Blocked',
+                'ready_for_qc': 'Ready for QC',
+                'done': 'Done'
+            };
+
+            let columnName = 'Not Started';
+            if (ticket.column_id) {
+                columnName = COLUMN_MAP[ticket.column_id];
+                if (!columnName) {
+                    columnName = 'Not Started';
+                }
+            }
+
+            const payload = {
+                title: ticket.title,
+                description: ticket.description || null,
+                acceptance_criteria: ticket.acceptance_criteria || null,
+                priority: ticket.priority || '1.0',
+                assignee: ticket.assignee || null,
+                board_id: parseInt(ticket.board_id || '0'),
+                current_column: columnName
+            };
+
+            result.innerHTML = `<div>
+                <h3>Input ticket:</h3>
+                <pre>${JSON.stringify(ticket, null, 2)}</pre>
+                <h3>Generated payload:</h3>
+                <pre>${JSON.stringify(payload, null, 2)}</pre>
+                <h3>Column mapping result:</h3>
+                <pre>column_id: "${ticket.column_id}" → current_column: "${columnName}"</pre>
+                <h3>Board ID parsing:</h3>
+                <pre>board_id: "${ticket.board_id}" → ${parseInt(ticket.board_id || '0')}</pre>
+            </div>`;
+        }
+
+        async function testBoardValidation() {
+            const result = document.getElementById('board-result');
+
+            // Test various board_id values
+            const testCases = [
+                { board_id: '1', expected: 1 },
+                { board_id: '0', expected: 0 },
+                { board_id: undefined, expected: 0 },
+                { board_id: '', expected: 0 },
+                { board_id: 'invalid', expected: NaN }
+            ];
+
+            let output = '<h3>Board ID Validation Tests:</h3>';
+
+            for (const test of testCases) {
+                const parsed = parseInt(test.board_id || '0');
+                const isValid = parsed > 0 && !isNaN(parsed);
+                const status = isValid ? '✅' : '❌';
+
+                output += `<div>${status} board_id: "${test.board_id}" → ${parsed} (valid: ${isValid})</div>`;
+
+                if (!isValid) {
+                    output += `<div class="error">  ⚠️ This would cause API error!</div>`;
+                }
+            }
+
+            result.innerHTML = output;
+        }
+    </script>
+</body>
+</html>

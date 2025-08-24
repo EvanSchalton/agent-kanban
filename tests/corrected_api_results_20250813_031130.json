@@ -1,0 +1,52 @@
+{
+  "summary": {
+    "total": 7,
+    "passed": 1,
+    "failed": 6,
+    "success_rate": 14.285714285714285
+  },
+  "results": [
+    {
+      "test": "Health Check",
+      "success": false,
+      "details": "HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f24ee545850>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "timestamp": "2025-08-13T03:11:30.184758"
+    },
+    {
+      "test": "List Boards (corrected)",
+      "success": false,
+      "details": "HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/boards/ (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f24ee547210>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "timestamp": "2025-08-13T03:11:30.191186"
+    },
+    {
+      "test": "Get Board 1",
+      "success": false,
+      "details": "HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/boards/1 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f24ee548c90>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "timestamp": "2025-08-13T03:11:30.202098"
+    },
+    {
+      "test": "Get Board 1 Tickets",
+      "success": false,
+      "details": "HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/tickets/?board_id=1 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f24ee54a490>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "timestamp": "2025-08-13T03:11:30.207185"
+    },
+    {
+      "test": "Create Test Ticket",
+      "success": false,
+      "details": "HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/tickets/ (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f24ee54bc10>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "timestamp": "2025-08-13T03:11:30.210847"
+    },
+    {
+      "test": "Get Default Board",
+      "success": false,
+      "details": "HTTPConnectionPool(host='localhost', port=8000): Max retries exceeded with url: /api/boards/default (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f24ee551090>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+      "timestamp": "2025-08-13T03:11:30.215064"
+    },
+    {
+      "test": "WebSocket Connection",
+      "success": true,
+      "details": "Connected and sent message",
+      "timestamp": "2025-08-13T03:11:30.217322"
+    }
+  ]
+}

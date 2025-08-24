@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban API Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f3f4f6;
+        }
+        h1 {
+            color: #1f2937;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .success {
+            color: #10b981;
+            background: #d1fae5;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .error {
+            color: #ef4444;
+            background: #fee2e2;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        pre {
+            background: #f9fafb;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.connected {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status.disconnected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Kanban API Integration Test</h1>
+
+    <div class="test-section">
+        <h2>Server Status</h2>
+        <p>Backend API: <span id="backend-status" class="status disconnected">Checking...</span></p>
+        <p>Frontend Dev: <span id="frontend-status" class="status disconnected">Checking...</span></p>
+    </div>
+
+    <div class="test-section">
+        <h2>API Tests</h2>
+        <button onclick="testGetBoard()">Test Get Board</button>
+        <button onclick="testGetTickets()">Test Get Tickets</button>
+        <button onclick="testMoveTicket()">Test Move Ticket</button>
+        <button onclick="testBulkMove()">Test Bulk Move (May Fail)</button>
+        <button onclick="testWebSocket()">Test WebSocket</button>
+        <div id="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Live Ticket Data</h2>
+        <button onclick="loadLiveData()">Load Current Tickets</button>
+        <div id="live-data"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        const BOARD_ID = 1;
+
+        // Check server status on load
+        window.onload = async () => {
+            // Check backend
+            try {
+                const resp = await fetch(`${API_BASE}/docs`);
+                if (resp.ok) {
+                    document.getElementById('backend-status').className = 'status connected';
+                    document.getElementById('backend-status').textContent = 'Connected (Port 8000)';
+                }
+            } catch (e) {
+                document.getElementById('backend-status').textContent = 'Not Available';
+            }
+
+            // Check frontend
+            try {
+                const resp = await fetch('http://localhost:15174/');
+                if (resp.ok) {
+                    document.getElementById('frontend-status').className = 'status connected';
+                    document.getElementById('frontend-status').textContent = 'Connected (Port 15174)';
+                }
+            } catch (e) {
+                // Try standard port
+                try {
+                    const resp2 = await fetch('http://localhost:5173/');
+                    if (resp2.ok) {
+                        document.getElementById('frontend-status').className = 'status connected';
+                        document.getElementById('frontend-status').textContent = 'Connected (Port 5173)';
+                    }
+                } catch (e2) {
+                    document.getElementById('frontend-status').textContent = 'Not Available';
+                }
+            }
+        };
+
+        function showResult(message, isError = false) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = isError ? 'error' : 'success';
+            resultDiv.innerHTML = message;
+        }
+
+        async function testGetBoard() {
+            try {
+                const response = await fetch(`${API_BASE}/api/boards/${BOARD_ID}`);
+                const data = await response.json();
+                showResult(`✅ Board loaded: ${data.name}<br>Columns: ${data.columns.join(', ')}`);
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, true);
+            }
+        }
+
+        async function testGetTickets() {
+            try {
+                const response = await fetch(`${API_BASE}/api/boards/${BOARD_ID}/tickets`);
+                const data = await response.json();
+                showResult(`✅ Found ${data.total_tickets} tickets<br>First ticket: ${data.tickets[0]?.title || 'None'}`);
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, true);
+            }
+        }
+
+        async function testMoveTicket() {
+            try {
+                // First get tickets
+                const ticketsResp = await fetch(`${API_BASE}/api/boards/${BOARD_ID}/tickets`);
+                const ticketsData = await ticketsResp.json();
+
+                if (ticketsData.tickets.length === 0) {
+                    showResult('⚠️ No tickets to move', true);
+                    return;
+                }
+
+                const ticket = ticketsData.tickets[0];
+                const newColumn = ticket.current_column === 'done' ? 'in_progress' : 'done';
+
+                const response = await fetch(`${API_BASE}/api/tickets/${ticket.id}/move`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({column: newColumn})
+                });
+
+                if (response.ok) {
+                    showResult(`✅ Moved ticket "${ticket.title}" to ${newColumn}`);
+                } else {
+                    const error = await response.json();
+                    showResult(`❌ Move failed: ${error.detail}`, true);
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, true);
+            }
+        }
+
+        async function testBulkMove() {
+            try {
+                const response = await fetch(`${API_BASE}/api/tickets/bulk/move`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        ticket_ids: [1, 2],
+                        target_column: 'in_progress'
+                    })
+                });
+
+                if (response.ok) {
+                    showResult('✅ Bulk move successful');
+                } else {
+                    const error = await response.json();
+                    showResult(`⚠️ Bulk move endpoint not implemented yet: ${response.status}`, true);
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, true);
+            }
+        }
+
+        async function testWebSocket() {
+            try {
+                const ws = new WebSocket(`ws://localhost:8000/ws/connect`);
+
+                ws.onopen = () => {
+                    showResult('✅ WebSocket connected! Listening for events...');
+                    setTimeout(() => ws.close(), 5000);
+                };
+
+                ws.onerror = (error) => {
+                    showResult('⚠️ WebSocket not available yet', true);
+                };
+
+                ws.onmessage = (event) => {
+                    showResult(`📨 Received: ${event.data}`);
+                };
+            } catch (error) {
+                showResult(`❌ WebSocket error: ${error.message}`, true);
+            }
+        }
+
+        async function loadLiveData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/boards/${BOARD_ID}/tickets`);
+                const data = await response.json();
+
+                const liveDiv = document.getElementById('live-data');
+                liveDiv.innerHTML = `
+                    <h3>Board: ${data.board_name}</h3>
+                    <p>Total Tickets: ${data.total_tickets}</p>
+                    <pre>${JSON.stringify(data.tickets, null, 2)}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('live-data').innerHTML = `<div class="error">❌ ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Drag & Drop Monitor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+        }
+        .test-section h3 {
+            color: #2563eb;
+            margin-top: 0;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            position: relative;
+        }
+        .app-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 3px;
+        }
+        .status-panel {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-good { background: #22c55e; }
+        .status-warning { background: #f59e0b; }
+        .status-error { background: #ef4444; }
+        .test-checklist {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .test-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 3px;
+            border-left: 4px solid #ddd;
+        }
+        .test-item.pending { border-left-color: #f59e0b; }
+        .test-item.testing { border-left-color: #3b82f6; }
+        .test-item.passed { border-left-color: #22c55e; }
+        .test-item.failed { border-left-color: #ef4444; }
+        .console-output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        .instructions {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .critical-bug {
+            background: #fef2f2;
+            border: 2px solid #ef4444;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .button {
+            background: #2563eb;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background: #1d4ed8;
+        }
+        .button.danger {
+            background: #ef4444;
+        }
+        .button.danger:hover {
+            background: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚨 QA Testing Monitor - Critical P0 Drag & Drop Bug</h1>
+            <p>Testing systematic fix for card disappearance during drag operations</p>
+        </div>
+
+        <div class="critical-bug">
+            <h3>🔴 CRITICAL P0 BUG MONITORING</h3>
+            <p><strong>Issue:</strong> Cards disappear during drag & drop operations between columns</p>
+            <p><strong>Fix Status:</strong> Under development - monitoring Board.tsx changes</p>
+            <p><strong>Test Focus:</strong> Data persistence, column detection, WebSocket sync</p>
+        </div>
+
+        <div class="instructions">
+            <h3>📋 QA Testing Instructions</h3>
+            <ol>
+                <li>Open the app iframe below</li>
+                <li>Create a test board and add sample cards</li>
+                <li>Test each scenario in the checklist</li>
+                <li>Monitor browser console for errors</li>
+                <li>Document any data loss or UI issues</li>
+            </ol>
+        </div>
+
+        <div class="status-panel">
+            <h3>📊 System Status</h3>
+            <div>
+                <span class="status-indicator status-good"></span>
+                <strong>Backend API:</strong> <span id="backend-status">Checking...</span>
+            </div>
+            <div>
+                <span class="status-indicator status-good"></span>
+                <strong>Frontend:</strong> <span id="frontend-status">Checking...</span>
+            </div>
+            <div>
+                <span class="status-indicator status-warning"></span>
+                <strong>WebSocket:</strong> <span id="websocket-status">Checking...</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Application Under Test</h3>
+            <div class="iframe-container">
+                <iframe
+                    id="app-iframe"
+                    class="app-iframe"
+                    src="http://localhost:15173"
+                    title="Agent Kanban Board">
+                </iframe>
+            </div>
+            <button class="button" onclick="reloadApp()">🔄 Reload App</button>
+            <button class="button" onclick="openInNewTab()">🔗 Open in New Tab</button>
+            <button class="button danger" onclick="clearConsole()">🗑️ Clear Console</button>
+        </div>
+
+        <div class="test-section">
+            <h3>✅ P0 Drag & Drop Test Checklist</h3>
+            <div class="test-checklist">
+                <div class="test-item pending" id="test-1">
+                    <input type="checkbox" id="check-1">
+                    <label for="check-1">Create test board and navigate to it</label>
+                </div>
+                <div class="test-item pending" id="test-2">
+                    <input type="checkbox" id="check-2">
+                    <label for="check-2">Add 3-5 test cards to 'TODO' column</label>
+                </div>
+                <div class="test-item pending" id="test-3">
+                    <input type="checkbox" id="check-3">
+                    <label for="check-3">Drag card from TODO → IN_PROGRESS (critical P0 test)</label>
+                </div>
+                <div class="test-item pending" id="test-4">
+                    <input type="checkbox" id="check-4">
+                    <label for="check-4">Verify card appears in target column (no disappearance)</label>
+                </div>
+                <div class="test-item pending" id="test-5">
+                    <input type="checkbox" id="check-5">
+                    <label for="check-5">Test drag between all column combinations</label>
+                </div>
+                <div class="test-item pending" id="test-6">
+                    <input type="checkbox" id="check-6">
+                    <label for="check-6">Test rapid multiple drag operations</label>
+                </div>
+                <div class="test-item pending" id="test-7">
+                    <input type="checkbox" id="check-7">
+                    <label for="check-7">Test drag cancellation (drag and drop outside)</label>
+                </div>
+                <div class="test-item pending" id="test-8">
+                    <input type="checkbox" id="check-8">
+                    <label for="check-8">Test drag to empty columns</label>
+                </div>
+                <div class="test-item pending" id="test-9">
+                    <input type="checkbox" id="check-9">
+                    <label for="check-9">Verify WebSocket real-time updates</label>
+                </div>
+                <div class="test-item pending" id="test-10">
+                    <input type="checkbox" id="check-10">
+                    <label for="check-10">Test card editing and modal interactions</label>
+                </div>
+                <div class="test-item pending" id="test-11">
+                    <input type="checkbox" id="check-11">
+                    <label for="check-11">Refresh page and verify persistence</label>
+                </div>
+                <div class="test-item pending" id="test-12">
+                    <input type="checkbox" id="check-12">
+                    <label for="check-12">Monitor console for JavaScript errors</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🖥️ Browser Console Monitor</h3>
+            <p>Monitor for errors during drag operations:</p>
+            <div class="console-output" id="console-output">
+                Console monitoring will appear here...
+                Open browser DevTools (F12) to see real-time console output.
+            </div>
+            <button class="button" onclick="copyBoardCode()">📋 Copy Board.tsx Debug Code</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📝 Bug Report Template</h3>
+            <textarea id="bug-report" rows="10" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" placeholder="Document any issues found during testing:
+
+Bug Title:
+Severity: P0/P1/P2
+Steps to Reproduce:
+1.
+2.
+3.
+
+Expected Result:
+Actual Result:
+Console Errors:
+Browser:
+Additional Notes:
+"></textarea>
+            <br>
+            <button class="button" onclick="saveBugReport()">💾 Save Bug Report</button>
+            <button class="button" onclick="clearBugReport()">🗑️ Clear</button>
+        </div>
+    </div>
+
+    <script>
+        // Status checking
+        async function checkBackendStatus() {
+            try {
+                const response = await fetch('http://localhost:8000/health');
+                document.getElementById('backend-status').textContent = response.ok ? 'Online ✅' : 'Issues ⚠️';
+            } catch (error) {
+                document.getElementById('backend-status').textContent = 'Offline ❌';
+            }
+        }
+
+        async function checkFrontendStatus() {
+            try {
+                const response = await fetch('http://localhost:15173');
+                document.getElementById('frontend-status').textContent = response.ok ? 'Online ✅' : 'Issues ⚠️';
+            } catch (error) {
+                document.getElementById('frontend-status').textContent = 'Offline ❌';
+            }
+        }
+
+        function checkWebSocketStatus() {
+            // This would require actual WebSocket testing
+            document.getElementById('websocket-status').textContent = 'Manual Test Required ⚠️';
+        }
+
+        // Control functions
+        function reloadApp() {
+            document.getElementById('app-iframe').src = document.getElementById('app-iframe').src;
+        }
+
+        function openInNewTab() {
+            window.open('http://localhost:15173', '_blank');
+        }
+
+        function clearConsole() {
+            document.getElementById('console-output').innerHTML = 'Console cleared...';
+        }
+
+        function copyBoardCode() {
+            const debugCode = `
+// Add this to Board.tsx for debugging drag operations
+console.log('🐛 DRAG DEBUG:', {
+    activeId: event.active.id,
+    overId: event.over?.id,
+    overData: event.over?.data,
+    collisions: event.collisions?.map(c => ({ id: c.id, type: typeof c.id }))
+});
+            `;
+            navigator.clipboard.writeText(debugCode).then(() => {
+                alert('Debug code copied to clipboard!');
+            });
+        }
+
+        function saveBugReport() {
+            const report = document.getElementById('bug-report').value;
+            if (report.trim()) {
+                const timestamp = new Date().toISOString();
+                const filename = `bug-report-${timestamp.slice(0,10)}.txt`;
+                const blob = new Blob([`Bug Report - ${timestamp}\n\n${report}`], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+            } else {
+                alert('Please enter bug details first');
+            }
+        }
+
+        function clearBugReport() {
+            document.getElementById('bug-report').value = '';
+        }
+
+        // Test item tracking
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const testItem = this.closest('.test-item');
+                if (this.checked) {
+                    testItem.className = 'test-item passed';
+                } else {
+                    testItem.className = 'test-item pending';
+                }
+            });
+        });
+
+        // Initialize status checks
+        checkBackendStatus();
+        checkFrontendStatus();
+        checkWebSocketStatus();
+
+        // Periodic status updates
+        setInterval(() => {
+            checkBackendStatus();
+            checkFrontendStatus();
+        }, 30000);
+
+        console.log('🚨 QA Monitor initialized - Ready for P0 drag & drop testing');
+    </script>
+</body>
+</html>

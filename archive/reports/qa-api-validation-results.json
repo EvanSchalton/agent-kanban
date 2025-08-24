@@ -1,0 +1,84 @@
+{
+  "timestamp": "2025-08-20T05:25:48.628760",
+  "summary": {
+    "total": 8,
+    "passed": 2,
+    "failed": 3,
+    "skipped": 3,
+    "success_rate": "25%"
+  },
+  "results": [
+    {
+      "test": "Health Endpoint",
+      "status": "PASS",
+      "timestamp": "2025-08-20T05:25:48.596250",
+      "details": {
+        "response": {
+          "status": "healthy",
+          "socketio": "available",
+          "cors": "enabled"
+        }
+      }
+    },
+    {
+      "test": "Endpoint /api/boards",
+      "status": "FAIL",
+      "timestamp": "2025-08-20T05:25:48.604578",
+      "details": {
+        "status_code": 405,
+        "response": "{\"detail\":\"Method Not Allowed\"}"
+      }
+    },
+    {
+      "test": "Endpoint /api/tickets",
+      "status": "FAIL",
+      "timestamp": "2025-08-20T05:25:48.612538",
+      "details": {
+        "status_code": 405,
+        "response": "{\"detail\":\"Method Not Allowed\"}"
+      }
+    },
+    {
+      "test": "Endpoint /",
+      "status": "PASS",
+      "timestamp": "2025-08-20T05:25:48.620767",
+      "details": {
+        "status_code": 200,
+        "method": "GET"
+      }
+    },
+    {
+      "test": "Boards API",
+      "status": "FAIL",
+      "timestamp": "2025-08-20T05:25:48.628472",
+      "details": {
+        "status_code": 405,
+        "response": "{\"detail\":\"Method Not Allowed\"}"
+      }
+    },
+    {
+      "test": "Card Creation Test",
+      "status": "SKIP",
+      "timestamp": "2025-08-20T05:25:48.628712",
+      "details": {
+        "reason": "No board_id available"
+      }
+    },
+    {
+      "test": "CRUD Operations",
+      "status": "SKIP",
+      "timestamp": "2025-08-20T05:25:48.628729",
+      "details": {
+        "reason": "No board_id available"
+      }
+    },
+    {
+      "test": "Board ID Requirement",
+      "status": "SKIP",
+      "timestamp": "2025-08-20T05:25:48.628740",
+      "details": {
+        "reason": "No board_id available"
+      }
+    }
+  ]
+}

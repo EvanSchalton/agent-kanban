@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>End-to-End Integration Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .test-result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .pass { background-color: #d4edda; color: #155724; }
+        .fail { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        .test-section { border: 1px solid #ddd; padding: 15px; margin: 20px 0; border-radius: 8px; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        .endpoints { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .endpoints { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <h1>🔧 End-to-End Integration Test</h1>
+    <p><strong>Production Frontend:</strong> http://localhost:4000</p>
+    <p><strong>Backend API:</strong> http://localhost:18000</p>
+
+    <div class="endpoints">
+        <div class="test-section">
+            <h2>📱 Frontend Tests</h2>
+            <div id="frontend-results"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔌 Backend API Tests</h2>
+            <div id="backend-results"></div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🌐 Full-Stack Integration</h2>
+        <div id="integration-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Test Summary</h2>
+        <div id="summary-results"></div>
+    </div>
+
+    <script>
+        let testResults = {
+            frontend: { passed: 0, failed: 0, total: 0 },
+            backend: { passed: 0, failed: 0, total: 0 },
+            integration: { passed: 0, failed: 0, total: 0 }
+        };
+
+        async function testEndpoint(url, description, category = 'backend') {
+            testResults[category].total++;
+
+            try {
+                const response = await fetch(url);
+                const success = response.ok;
+
+                if (success) {
+                    testResults[category].passed++;
+                } else {
+                    testResults[category].failed++;
+                }
+
+                return {
+                    success,
+                    status: response.status,
+                    statusText: response.statusText,
+                    description,
+                    url
+                };
+            } catch (error) {
+                testResults[category].failed++;
+                return {
+                    success: false,
+                    error: error.message,
+                    description,
+                    url
+                };
+            }
+        }
+
+        function displayResult(result, containerId) {
+            const container = document.getElementById(containerId);
+            const resultClass = result.success ? 'pass' : 'fail';
+            const icon = result.success ? '✅' : '❌';
+            const status = result.error ? result.error : `${result.status} ${result.statusText}`;
+
+            container.innerHTML += `
+                <div class="test-result ${resultClass}">
+                    ${icon} <strong>${result.description}</strong><br>
+                    <small>${result.url}</small><br>
+                    Status: ${status}
+                </div>
+            `;
+        }
+
+        async function runTests() {
+            // Frontend Tests
+            let result = await testEndpoint('http://localhost:4000/', 'Production build served', 'frontend');
+            displayResult(result, 'frontend-results');
+
+            result = await testEndpoint('http://localhost:4000/assets/index-wV2d9t09.js', 'JS bundle available', 'frontend');
+            displayResult(result, 'frontend-results');
+
+            result = await testEndpoint('http://localhost:4000/assets/index-DSjipFrs.css', 'CSS bundle available', 'frontend');
+            displayResult(result, 'frontend-results');
+
+            // Backend API Tests
+            result = await testEndpoint('http://localhost:18000/health', 'Backend health check', 'backend');
+            displayResult(result, 'backend-results');
+
+            result = await testEndpoint('http://localhost:18000/docs', 'API documentation', 'backend');
+            displayResult(result, 'backend-results');
+
+            result = await testEndpoint('http://localhost:18000/openapi.json', 'OpenAPI schema', 'backend');
+            displayResult(result, 'backend-results');
+
+            result = await testEndpoint('http://localhost:18000/api/boards/', 'Boards API endpoint', 'backend');
+            displayResult(result, 'backend-results');
+
+            // Integration Tests
+            try {
+                // Test if frontend can communicate with backend
+                const frontendResponse = await fetch('http://localhost:4000/');
+                const backendResponse = await fetch('http://localhost:18000/health');
+
+                if (frontendResponse.ok && backendResponse.ok) {
+                    testResults.integration.passed++;
+                    document.getElementById('integration-results').innerHTML += `
+                        <div class="test-result pass">
+                            ✅ <strong>Cross-origin communication ready</strong><br>
+                            Both frontend (${frontendResponse.status}) and backend (${backendResponse.status}) are responding
+                        </div>
+                    `;
+                } else {
+                    testResults.integration.failed++;
+                    document.getElementById('integration-results').innerHTML += `
+                        <div class="test-result fail">
+                            ❌ <strong>Integration issue detected</strong><br>
+                            Frontend: ${frontendResponse.status}, Backend: ${backendResponse.status}
+                        </div>
+                    `;
+                }
+                testResults.integration.total++;
+
+                // Test WebSocket endpoint availability
+                result = await testEndpoint('http://localhost:18000/ws/connect', 'WebSocket endpoint available', 'integration');
+                displayResult({
+                    ...result,
+                    description: 'WebSocket endpoint availability'
+                }, 'integration-results');
+
+            } catch (error) {
+                testResults.integration.failed++;
+                testResults.integration.total++;
+                document.getElementById('integration-results').innerHTML += `
+                    <div class="test-result fail">
+                        ❌ <strong>Integration test failed</strong><br>
+                        Error: ${error.message}
+                    </div>
+                `;
+            }
+
+            // Display Summary
+            const totalTests = testResults.frontend.total + testResults.backend.total + testResults.integration.total;
+            const totalPassed = testResults.frontend.passed + testResults.backend.passed + testResults.integration.passed;
+            const totalFailed = testResults.frontend.failed + testResults.backend.failed + testResults.integration.failed;
+
+            const overallStatus = totalFailed === 0 ? 'pass' : (totalPassed > totalFailed ? 'warning' : 'fail');
+            const overallIcon = totalFailed === 0 ? '🎉' : (totalPassed > totalFailed ? '⚠️' : '❌');
+
+            document.getElementById('summary-results').innerHTML = `
+                <div class="test-result ${overallStatus}">
+                    ${overallIcon} <strong>Overall Status</strong><br>
+                    Total Tests: ${totalTests} | Passed: ${totalPassed} | Failed: ${totalFailed}
+                </div>
+                <div class="test-result info">
+                    📊 <strong>Category Breakdown:</strong><br>
+                    Frontend: ${testResults.frontend.passed}/${testResults.frontend.total}<br>
+                    Backend API: ${testResults.backend.passed}/${testResults.backend.total}<br>
+                    Integration: ${testResults.integration.passed}/${testResults.integration.total}
+                </div>
+                ${totalFailed === 0 ? `
+                    <div class="test-result pass">
+                        🚀 <strong>Deployment Ready!</strong><br>
+                        All systems operational. Production build validated and ready for deployment.
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        // Start tests when page loads
+        document.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html>

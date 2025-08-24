@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #0f0;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #0f0;
+        }
+        .connected { background: #002200; }
+        .disconnected { background: #220000; color: #f00; border-color: #f00; }
+        .message {
+            padding: 5px;
+            margin: 5px 0;
+            background: #111;
+            border-left: 3px solid #0f0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #003300;
+            color: #0f0;
+            border: 1px solid #0f0;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #005500;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Connection Test</h1>
+    <div id="status" class="status disconnected">Disconnected</div>
+
+    <div>
+        <button onclick="connect()">Connect</button>
+        <button onclick="disconnect()">Disconnect</button>
+        <button onclick="sendPing()">Send Ping</button>
+        <button onclick="simulateTicketUpdate()">Simulate Ticket Update</button>
+    </div>
+
+    <h2>Messages:</h2>
+    <div id="messages"></div>
+
+    <script>
+        let ws = null;
+        let messageCount = 0;
+
+        function updateStatus(connected) {
+            const status = document.getElementById('status');
+            if (connected) {
+                status.textContent = '✓ Connected';
+                status.className = 'status connected';
+            } else {
+                status.textContent = '✗ Disconnected';
+                status.className = 'status disconnected';
+            }
+        }
+
+        function addMessage(type, data) {
+            const messages = document.getElementById('messages');
+            const message = document.createElement('div');
+            message.className = 'message';
+            message.innerHTML = `
+                <strong>[${new Date().toLocaleTimeString()}] ${type}:</strong>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+            messages.insertBefore(message, messages.firstChild);
+            messageCount++;
+
+            // Keep only last 20 messages
+            while (messages.children.length > 20) {
+                messages.removeChild(messages.lastChild);
+            }
+        }
+
+        function connect() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                addMessage('Info', 'Already connected');
+                return;
+            }
+
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws/connect`;
+
+            addMessage('Info', `Connecting to ${wsUrl}...`);
+
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                updateStatus(true);
+                addMessage('Connected', 'WebSocket connection established');
+            };
+
+            ws.onclose = (event) => {
+                updateStatus(false);
+                addMessage('Disconnected', {
+                    code: event.code,
+                    reason: event.reason || 'No reason provided'
+                });
+            };
+
+            ws.onerror = (error) => {
+                addMessage('Error', 'WebSocket error occurred');
+                console.error('WebSocket error:', error);
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const message = JSON.parse(event.data);
+                    addMessage('Received', message);
+
+                    // Auto-respond to ping with pong
+                    if (message.type === 'ping') {
+                        ws.send(JSON.stringify({ type: 'pong' }));
+                        addMessage('Sent', { type: 'pong' });
+                    }
+                } catch (e) {
+                    addMessage('Raw Message', event.data);
+                }
+            };
+        }
+
+        function disconnect() {
+            if (ws) {
+                ws.close(1000, 'Manual disconnect');
+                ws = null;
+            }
+        }
+
+        function sendPing() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const message = { type: 'ping' };
+                ws.send(JSON.stringify(message));
+                addMessage('Sent', message);
+            } else {
+                addMessage('Error', 'Not connected');
+            }
+        }
+
+        function simulateTicketUpdate() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const message = {
+                    type: 'ticket_updated',
+                    data: {
+                        id: '123',
+                        title: 'Test Ticket',
+                        column_id: 'in_progress',
+                        priority: 'high',
+                        updated_at: new Date().toISOString()
+                    }
+                };
+                addMessage('Simulated', message);
+                // Note: This would normally come from the server
+                addMessage('Info', 'In production, ticket updates come from the server');
+            } else {
+                addMessage('Error', 'Not connected');
+            }
+        }
+
+        // Auto-connect on page load
+        window.addEventListener('load', () => {
+            setTimeout(connect, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,263 @@
+{
+  "timestamp": "2025-08-10T23:25:15.865021",
+  "scenario_results": {
+    "scenario_1": {
+      "scenario": "Frontend Load with Backend Down",
+      "backend_status": {
+        "service": "Backend",
+        "status": "UP",
+        "response_code": 200,
+        "response_time_ms": 5.396
+      },
+      "frontend_status": {
+        "service": "Frontend",
+        "status": "UP",
+        "response_code": 200,
+        "response_time_ms": 69.70800000000001
+      },
+      "findings": [
+        "\ud83d\udcdd Backend is currently running",
+        "\ud83d\udca1 To test this scenario: stop backend service first",
+        "\ud83d\udd27 Both services appear healthy"
+      ]
+    },
+    "scenario_2": {
+      "scenario": "WebSocket Wrong Port Issue",
+      "current_code": "ws://localhost:15175/ws/connect",
+      "correct_code": "ws://localhost:15173/ws/connect (through proxy)",
+      "status": "COMMENTED OUT - Currently disabled",
+      "findings": [
+        "\ud83d\udea8 CRITICAL: WebSocket uses wrong port (15175 instead of 15173)",
+        "\u274c Real-time updates completely disabled",
+        "\ud83d\udccd Location: BoardContext.tsx:121",
+        "\ud83d\udd27 Fix: Use '/ws/connect' to go through Vite proxy",
+        "\u2705 WebSocket infrastructure code is well-written (auto-reconnect, error handling)",
+        "\u26a0\ufe0f Just needs URL correction to enable functionality"
+      ],
+      "impact": "Zero real-time collaboration, users must refresh manually",
+      "user_experience": "No live updates when other users make changes"
+    },
+    "scenario_3": {
+      "scenario": "API Error Handling",
+      "tests_run": 4,
+      "responses": [
+        {
+          "endpoint": "/api/boards/999",
+          "method": "GET",
+          "description": "Non-existent board",
+          "status_code": 404,
+          "error_message": "{\"error\":{\"message\":\"Board not found\",\"error_id\":\"err_1754868309998\",\"timestamp\":1754868309}}"
+        },
+        {
+          "endpoint": "/api/tickets/999",
+          "method": "GET",
+          "description": "Non-existent ticket",
+          "status_code": 404,
+          "error_message": "{\"error\":{\"message\":\"Ticket not found\",\"error_id\":\"err_1754868310439\",\"timestamp\":1754868310}}"
+        },
+        {
+          "endpoint": "/api/tickets/999/move",
+          "method": "POST",
+          "description": "Invalid move operation",
+          "status_code": 422,
+          "error_message": "{\"error\":{\"message\":\"Request validation failed\",\"code\":\"VALIDATION_ERROR\",\"error_id\":\"err_1754868310516\",\"timestamp\":1754868310,\"validation_errors\":[{\"field\":\"body.column\",\"message\":\"Field required\",\""
+        },
+        {
+          "endpoint": "/api/tickets/",
+          "method": "POST",
+          "description": "Create without required fields",
+          "status_code": 422,
+          "error_message": "{\"error\":{\"message\":\"Request validation failed\",\"code\":\"VALIDATION_ERROR\",\"error_id\":\"err_1754868310736\",\"timestamp\":1754868310,\"validation_errors\":[{\"field\":\"body.title\",\"message\":\"Field required\",\"t"
+        }
+      ],
+      "error_patterns": {
+        "404_errors": 2,
+        "422_validation_errors": 2,
+        "405_method_errors": 0,
+        "connection_errors": 0
+      },
+      "ui_impact_assessment": {
+        "good_practices": [
+          "\u2705 API returns proper HTTP status codes",
+          "\u2705 Error responses include descriptive messages",
+          "\u2705 Proxy routing working for error cases"
+        ],
+        "improvement_needed": [
+          "\u26a0\ufe0f Error messages are very technical",
+          "\u26a0\ufe0f Users will see raw API error responses",
+          "\ud83d\udca1 Need user-friendly error translations"
+        ]
+      }
+    },
+    "scenario_4": {
+      "scenario": "Drag-Drop During Backend Failure",
+      "test_ticket_id": 51,
+      "move_api_result": {
+        "status_code": 422,
+        "error": "{\"error\":{\"message\":\"Request validation failed\",\"code\":\"VALIDATION_ERROR\",\"error_id\":\"err_1754868310774\",\"timestamp\":1754868310,\"validation_errors\":[{\"field\":\"body.column\",\"message\":\"Field required\",\""
+      },
+      "user_experience_impact": [
+        "\u274c Drag operation appears to work in UI (optimistic update)",
+        "\u274c But ticket doesn't actually move (API fails)",
+        "\ud83d\ude2b User confusion: UI shows moved, but refresh shows original position",
+        "\ud83d\udea8 No visual feedback that the operation failed"
+      ],
+      "state_persistence": "LOST - optimistic updates not rolled back",
+      "recovery_mechanism": "User must refresh page to see true state"
+    },
+    "scenario_5": {
+      "scenario": "Connection Recovery Testing",
+      "attempts": 5,
+      "successes": 5,
+      "success_rate": 100.0,
+      "stability_assessment": "EXCELLENT",
+      "recovery_features": {
+        "api_retry_mechanism": "\u2705 Implemented (withRetry function, 3 attempts)",
+        "websocket_reconnect": "\u2705 Implemented but DISABLED (wrong URL)",
+        "frontend_resilience": "\u2705 Static content always available",
+        "error_state_management": "\u2705 Error states tracked in React"
+      },
+      "recovery_gaps": [
+        "\u26a0\ufe0f No user notification when connection is lost/restored",
+        "\u26a0\ufe0f Optimistic updates not rolled back on failure",
+        "\u26a0\ufe0f WebSocket reconnection disabled due to wrong URL"
+      ]
+    }
+  },
+  "test_summary": {
+    "scenarios": [
+      {
+        "scenario": "Frontend Load with Backend Down",
+        "backend_status": {
+          "service": "Backend",
+          "status": "UP",
+          "response_code": 200,
+          "response_time_ms": 5.396
+        },
+        "frontend_status": {
+          "service": "Frontend",
+          "status": "UP",
+          "response_code": 200,
+          "response_time_ms": 69.70800000000001
+        },
+        "findings": [
+          "\ud83d\udcdd Backend is currently running",
+          "\ud83d\udca1 To test this scenario: stop backend service first",
+          "\ud83d\udd27 Both services appear healthy"
+        ]
+      }
+    ],
+    "failures_documented": [
+      {
+        "scenario": "WebSocket Wrong Port Issue",
+        "current_code": "ws://localhost:15175/ws/connect",
+        "correct_code": "ws://localhost:15173/ws/connect (through proxy)",
+        "status": "COMMENTED OUT - Currently disabled",
+        "findings": [
+          "\ud83d\udea8 CRITICAL: WebSocket uses wrong port (15175 instead of 15173)",
+          "\u274c Real-time updates completely disabled",
+          "\ud83d\udccd Location: BoardContext.tsx:121",
+          "\ud83d\udd27 Fix: Use '/ws/connect' to go through Vite proxy",
+          "\u2705 WebSocket infrastructure code is well-written (auto-reconnect, error handling)",
+          "\u26a0\ufe0f Just needs URL correction to enable functionality"
+        ],
+        "impact": "Zero real-time collaboration, users must refresh manually",
+        "user_experience": "No live updates when other users make changes"
+      },
+      {
+        "scenario": "API Error Handling",
+        "tests_run": 4,
+        "responses": [
+          {
+            "endpoint": "/api/boards/999",
+            "method": "GET",
+            "description": "Non-existent board",
+            "status_code": 404,
+            "error_message": "{\"error\":{\"message\":\"Board not found\",\"error_id\":\"err_1754868309998\",\"timestamp\":1754868309}}"
+          },
+          {
+            "endpoint": "/api/tickets/999",
+            "method": "GET",
+            "description": "Non-existent ticket",
+            "status_code": 404,
+            "error_message": "{\"error\":{\"message\":\"Ticket not found\",\"error_id\":\"err_1754868310439\",\"timestamp\":1754868310}}"
+          },
+          {
+            "endpoint": "/api/tickets/999/move",
+            "method": "POST",
+            "description": "Invalid move operation",
+            "status_code": 422,
+            "error_message": "{\"error\":{\"message\":\"Request validation failed\",\"code\":\"VALIDATION_ERROR\",\"error_id\":\"err_1754868310516\",\"timestamp\":1754868310,\"validation_errors\":[{\"field\":\"body.column\",\"message\":\"Field required\",\""
+          },
+          {
+            "endpoint": "/api/tickets/",
+            "method": "POST",
+            "description": "Create without required fields",
+            "status_code": 422,
+            "error_message": "{\"error\":{\"message\":\"Request validation failed\",\"code\":\"VALIDATION_ERROR\",\"error_id\":\"err_1754868310736\",\"timestamp\":1754868310,\"validation_errors\":[{\"field\":\"body.title\",\"message\":\"Field required\",\"t"
+          }
+        ],
+        "error_patterns": {
+          "404_errors": 2,
+          "422_validation_errors": 2,
+          "405_method_errors": 0,
+          "connection_errors": 0
+        },
+        "ui_impact_assessment": {
+          "good_practices": [
+            "\u2705 API returns proper HTTP status codes",
+            "\u2705 Error responses include descriptive messages",
+            "\u2705 Proxy routing working for error cases"
+          ],
+          "improvement_needed": [
+            "\u26a0\ufe0f Error messages are very technical",
+            "\u26a0\ufe0f Users will see raw API error responses",
+            "\ud83d\udca1 Need user-friendly error translations"
+          ]
+        }
+      },
+      {
+        "scenario": "Drag-Drop During Backend Failure",
+        "test_ticket_id": 51,
+        "move_api_result": {
+          "status_code": 422,
+          "error": "{\"error\":{\"message\":\"Request validation failed\",\"code\":\"VALIDATION_ERROR\",\"error_id\":\"err_1754868310774\",\"timestamp\":1754868310,\"validation_errors\":[{\"field\":\"body.column\",\"message\":\"Field required\",\""
+        },
+        "user_experience_impact": [
+          "\u274c Drag operation appears to work in UI (optimistic update)",
+          "\u274c But ticket doesn't actually move (API fails)",
+          "\ud83d\ude2b User confusion: UI shows moved, but refresh shows original position",
+          "\ud83d\udea8 No visual feedback that the operation failed"
+        ],
+        "state_persistence": "LOST - optimistic updates not rolled back",
+        "recovery_mechanism": "User must refresh page to see true state"
+      }
+    ],
+    "recovery_patterns": [
+      {
+        "scenario": "Connection Recovery Testing",
+        "attempts": 5,
+        "successes": 5,
+        "success_rate": 100.0,
+        "stability_assessment": "EXCELLENT",
+        "recovery_features": {
+          "api_retry_mechanism": "\u2705 Implemented (withRetry function, 3 attempts)",
+          "websocket_reconnect": "\u2705 Implemented but DISABLED (wrong URL)",
+          "frontend_resilience": "\u2705 Static content always available",
+          "error_state_management": "\u2705 Error states tracked in React"
+        },
+        "recovery_gaps": [
+          "\u26a0\ufe0f No user notification when connection is lost/restored",
+          "\u26a0\ufe0f Optimistic updates not rolled back on failure",
+          "\u26a0\ufe0f WebSocket reconnection disabled due to wrong URL"
+        ]
+      }
+    ]
+  },
+  "executive_summary": {
+    "overall_health": "GOOD",
+    "critical_issues_count": 2,
+    "medium_issues_count": 1,
+    "working_features_count": 1
+  }
+}

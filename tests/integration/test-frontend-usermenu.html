@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend UserMenu Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .success { background: #d4f4dd; color: #22543d; }
+        .error { background: #fed7d7; color: #742a2a; }
+        .info { background: #e6f7ff; color: #004085; }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Frontend UserMenu Integration Test</h1>
+
+        <div class="test-section info">
+            <h3>Test Instructions</h3>
+            <p>This test validates the UserMenu component integration with the live React application.</p>
+            <ol>
+                <li>Click "Open React App" to open the main application</li>
+                <li>Look for the UserMenu in the top-right corner</li>
+                <li>Click the user avatar/username to open the dropdown</li>
+                <li>Test the "Change Username" functionality</li>
+                <li>Verify localStorage persistence</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h3>🚀 Quick Actions</h3>
+            <button onclick="openReactApp()">📱 Open React App</button>
+            <button onclick="checkLocalStorage()">💾 Check localStorage</button>
+            <button onclick="testWebSocketConnection()">🔗 Test WebSocket</button>
+            <button onclick="clearLocalStorage()">🗑️ Clear localStorage</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Test Results</h3>
+            <div id="testResults">
+                <p>Click the buttons above to run tests...</p>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Expected UserMenu Behavior</h3>
+            <ul>
+                <li><strong>Avatar Display:</strong> Shows user initials (e.g., "AL" for Alice)</li>
+                <li><strong>Username Display:</strong> Shows current username next to avatar</li>
+                <li><strong>Dropdown Menu:</strong> Opens when clicked, shows user info and actions</li>
+                <li><strong>Change Username:</strong> Opens modal with input field and live preview</li>
+                <li><strong>Save & Reconnect:</strong> Updates username and reconnects WebSocket</li>
+                <li><strong>localStorage:</strong> Username persists across browser sessions</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 Manual Test Checklist</h3>
+            <div id="manualChecklist">
+                <label><input type="checkbox"> UserMenu visible in navbar</label><br>
+                <label><input type="checkbox"> Avatar shows correct initials</label><br>
+                <label><input type="checkbox"> Username displays correctly</label><br>
+                <label><input type="checkbox"> Dropdown opens when clicked</label><br>
+                <label><input type="checkbox"> "Change Username" option available</label><br>
+                <label><input type="checkbox"> Modal opens for username editing</label><br>
+                <label><input type="checkbox"> Live preview shows new username</label><br>
+                <label><input type="checkbox"> Save triggers WebSocket reconnection</label><br>
+                <label><input type="checkbox"> Username persists after page reload</label><br>
+                <label><input type="checkbox"> WebSocket connection includes username</label><br>
+            </div>
+        </div>
+
+        <div class="test-section" id="websocketTest" style="display: none;">
+            <h3>🔗 WebSocket Connection Test</h3>
+            <div id="wsResults"></div>
+        </div>
+    </div>
+
+    <script>
+        function updateResults(message, type = 'info') {
+            const results = document.getElementById('testResults');
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            results.innerHTML += `<div class="${className}"><strong>${new Date().toLocaleTimeString()}:</strong> ${message}</div>`;
+        }
+
+        function openReactApp() {
+            updateResults('Opening React application in new window...', 'info');
+            const reactUrl = 'http://localhost:5173';
+            window.open(reactUrl, '_blank');
+            updateResults(`✅ React app should open at ${reactUrl}`, 'success');
+            updateResults('Look for UserMenu in top-right corner with avatar and username', 'info');
+        }
+
+        function checkLocalStorage() {
+            try {
+                const username = localStorage.getItem('username');
+                if (username) {
+                    updateResults(`✅ Username found in localStorage: "${username}"`, 'success');
+                } else {
+                    updateResults('ℹ️ No username found in localStorage (will use default)', 'info');
+                }
+
+                // List all localStorage items related to the app
+                const allItems = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key) {
+                        allItems.push(`${key}: ${localStorage.getItem(key)}`);
+                    }
+                }
+
+                if (allItems.length > 0) {
+                    updateResults(`📦 All localStorage items: ${allItems.join(', ')}`, 'info');
+                }
+
+            } catch (error) {
+                updateResults(`❌ Error accessing localStorage: ${error.message}`, 'error');
+            }
+        }
+
+        function testWebSocketConnection() {
+            const wsSection = document.getElementById('websocketTest');
+            const wsResults = document.getElementById('wsResults');
+
+            wsSection.style.display = 'block';
+            wsResults.innerHTML = '<p>Testing WebSocket connection...</p>';
+
+            try {
+                const username = localStorage.getItem('username') || 'TestUser';
+                const wsUrl = `ws://localhost:8000/ws/connect?username=${encodeURIComponent(username)}`;
+
+                updateResults(`🔗 Connecting to WebSocket: ${wsUrl}`, 'info');
+
+                const ws = new WebSocket(wsUrl);
+                let connected = false;
+
+                ws.onopen = () => {
+                    connected = true;
+                    updateResults('✅ WebSocket connected successfully!', 'success');
+                    wsResults.innerHTML += '<div class="success">✅ Connection established</div>';
+
+                    // Send a test message
+                    ws.send(JSON.stringify({ type: 'ping' }));
+                    updateResults('📤 Sent ping message', 'info');
+                };
+
+                ws.onmessage = (event) => {
+                    try {
+                        const message = JSON.parse(event.data);
+                        if (message.event === 'connected') {
+                            updateResults(`🎯 User authenticated as: ${message.data.username}`, 'success');
+                            wsResults.innerHTML += `<div class="success">👤 Username: ${message.data.username}</div>`;
+                        } else if (message.type === 'pong') {
+                            updateResults('🏓 Received pong response', 'success');
+                            wsResults.innerHTML += '<div class="success">🏓 Pong received</div>';
+                        } else if (message.event !== 'heartbeat') {
+                            updateResults(`📨 Received: ${JSON.stringify(message)}`, 'info');
+                        }
+                    } catch (error) {
+                        updateResults(`📨 Raw message: ${event.data}`, 'info');
+                    }
+                };
+
+                ws.onerror = (error) => {
+                    updateResults(`❌ WebSocket error: ${error}`, 'error');
+                    wsResults.innerHTML += '<div class="error">❌ Connection error</div>';
+                };
+
+                ws.onclose = () => {
+                    updateResults('🔌 WebSocket connection closed', 'info');
+                    wsResults.innerHTML += '<div class="info">🔌 Connection closed</div>';
+                };
+
+                // Auto-close after 10 seconds
+                setTimeout(() => {
+                    if (connected) {
+                        ws.close();
+                        updateResults('✅ WebSocket test completed successfully', 'success');
+                    } else {
+                        updateResults('❌ WebSocket connection failed', 'error');
+                    }
+                }, 10000);
+
+            } catch (error) {
+                updateResults(`❌ WebSocket test failed: ${error.message}`, 'error');
+                wsResults.innerHTML += `<div class="error">❌ Test failed: ${error.message}</div>`;
+            }
+        }
+
+        function clearLocalStorage() {
+            if (confirm('Clear all localStorage data for testing?')) {
+                localStorage.clear();
+                updateResults('🗑️ localStorage cleared', 'info');
+                updateResults('Refresh the React app to see default username generation', 'info');
+            }
+        }
+
+        // Auto-run localStorage check on page load
+        window.onload = () => {
+            updateResults('🚀 Frontend UserMenu Integration Test ready', 'info');
+            checkLocalStorage();
+        };
+    </script>
+</body>
+</html>

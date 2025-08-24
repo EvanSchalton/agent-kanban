@@ -1,0 +1,8 @@
+✅ Database protection installed - drop_all is now protected
+✅ Protected method: clear
+✅ Protected method: clear
+Redis connection failed: Error 111 connecting to localhost:6379. Connection refused.. Token blacklist will not be available.
+Redis cache connection failed: Error 111 connecting to localhost:6379. Connection refused.. Caching will be disabled.
+Server initialized for aiohttp.
+INFO:     Will watch for changes in these directories: ['/workspaces/agent-kanban/backend']
+ERROR:    [Errno 98] Address already in use

@@ -1,0 +1,1042 @@
+[
+  {
+    "timestamp": "2025-08-22T21:07:13.971Z",
+    "pageLoad": {
+      "namelookup": 1.281,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 30,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 58,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 53,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-22T21:22:14.535Z",
+    "pageLoad": {
+      "namelookup": 22.743,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 144,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 204,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 212,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-22T21:37:14.532Z",
+    "pageLoad": {
+      "namelookup": 1.248,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 23,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 64,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 72,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-22T21:52:14.557Z",
+    "pageLoad": {
+      "namelookup": 1.287,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 25,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 34,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 65,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-22T22:07:14.675Z",
+    "pageLoad": {
+      "namelookup": 1.616,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 39,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 51,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 68,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-22T22:22:14.700Z",
+    "pageLoad": {
+      "namelookup": 0.882,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 26,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 32,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 35,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-22T22:37:14.726Z",
+    "pageLoad": {
+      "namelookup": 0.921,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 29,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 36,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 45,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-22T22:52:14.753Z",
+    "pageLoad": {
+      "namelookup": 0.809,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 30,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 29,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 37,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-22T23:07:14.790Z",
+    "pageLoad": {
+      "namelookup": 0.757,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 13,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 18,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 30,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-22T23:22:14.816Z",
+    "pageLoad": {
+      "namelookup": 0.6679999999999999,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 14,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 21,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 33,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-22T23:37:14.793Z",
+    "pageLoad": {
+      "namelookup": 0.796,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 17,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 23,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 38,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-22T23:52:14.752Z",
+    "pageLoad": {
+      "namelookup": 0.7969999999999999,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 13,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 21,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 34,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-23T00:07:14.798Z",
+    "pageLoad": {
+      "namelookup": 0.696,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 17,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 19,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 30,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-23T00:22:14.890Z",
+    "pageLoad": {
+      "namelookup": 0.6769999999999999,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 13,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 33,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 35,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-23T00:37:14.899Z",
+    "pageLoad": {
+      "namelookup": 0.632,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 13,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 19,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 31,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-23T00:52:14.891Z",
+    "pageLoad": {
+      "namelookup": 0.865,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 15,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 22,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 36,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-23T01:07:14.899Z",
+    "pageLoad": {
+      "namelookup": 0.809,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 15,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 20,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 35,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-23T01:22:14.899Z",
+    "pageLoad": {
+      "namelookup": 0.8130000000000001,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 17,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 21,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 35,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-23T01:37:14.818Z",
+    "pageLoad": {
+      "namelookup": 0.865,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 15,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 21,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 30,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-23T01:52:14.992Z",
+    "pageLoad": {
+      "namelookup": 1.042,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 15,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 21,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 33,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-23T02:07:15.012Z",
+    "pageLoad": {
+      "namelookup": 0.633,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 12,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 19,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 38,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-23T02:22:15.162Z",
+    "pageLoad": {
+      "namelookup": 0.921,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 18,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 40,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 38,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-23T02:37:15.169Z",
+    "pageLoad": {
+      "namelookup": 0.9380000000000001,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 19,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 30,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 42,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-23T02:52:15.171Z",
+    "pageLoad": {
+      "namelookup": 0.6930000000000001,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 14,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 20,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 32,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-23T03:07:15.345Z",
+    "pageLoad": {
+      "namelookup": 0.815,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 25,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 25,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 39,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  },
+  {
+    "timestamp": "2025-08-23T03:22:15.318Z",
+    "pageLoad": {
+      "namelookup": 0.78,
+      "connect": null,
+      "starttransfer": null,
+      "total": null,
+      "downloadSize": null,
+      "headerSize": null,
+      "downloadSpeed": null,
+      "httpCode": null
+    },
+    "network": {
+      "health": {
+        "duration": 16,
+        "statusCode": 200,
+        "success": true
+      },
+      "boards": {
+        "duration": 34,
+        "statusCode": 200,
+        "success": true
+      },
+      "tickets": {
+        "duration": 36,
+        "statusCode": 200,
+        "success": true
+      }
+    },
+    "health": {
+      "frontend": {
+        "status": 200,
+        "healthy": true
+      },
+      "backend": {
+        "status": 200,
+        "healthy": true
+      }
+    }
+  }
+]

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Card Creation API Test</title>
+</head>
+<body>
+    <h1>Card Creation API Test</h1>
+    <button onclick="testAPI()">Test Card Creation</button>
+    <div id="results"></div>
+
+    <script>
+        async function testAPI() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing API connection...</p>';
+
+            try {
+                // Test health endpoint
+                const healthResponse = await fetch('/api/health');
+                const healthData = await healthResponse.json();
+                results.innerHTML += `<p>✅ Health Check: ${JSON.stringify(healthData)}</p>`;
+
+                // Test boards endpoint
+                const boardsResponse = await fetch('/api/boards/');
+                const boardsData = await boardsResponse.json();
+                results.innerHTML += `<p>✅ Boards: Found ${boardsData.length} boards</p>`;
+
+                // Test card creation
+                const createResponse = await fetch('/api/tickets/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: 'Frontend Test Card',
+                        description: 'Testing card creation from frontend',
+                        board_id: 1,
+                        current_column: 'Not Started'
+                    })
+                });
+
+                if (createResponse.ok) {
+                    const cardData = await createResponse.json();
+                    results.innerHTML += `<p>✅ Card Created: ${JSON.stringify(cardData)}</p>`;
+                } else {
+                    const error = await createResponse.text();
+                    results.innerHTML += `<p>❌ Card Creation Failed: ${createResponse.status} - ${error}</p>`;
+                }
+
+            } catch (error) {
+                results.innerHTML += `<p>❌ Network Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

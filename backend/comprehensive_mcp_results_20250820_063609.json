@@ -1,0 +1,80 @@
+{
+  "test_run": "2025-08-20T06:36:09.626321",
+  "summary": {
+    "total": 11,
+    "passed": 11,
+    "failed": 0,
+    "success_rate": 100.0
+  },
+  "created_tickets": [
+    66
+  ],
+  "detailed_results": [
+    {
+      "test": "list_columns",
+      "success": true,
+      "details": "Found 5 columns",
+      "timestamp": "2025-08-20T06:36:08.342399"
+    },
+    {
+      "test": "get_board_state",
+      "success": true,
+      "details": "All required fields present",
+      "timestamp": "2025-08-20T06:36:08.398718"
+    },
+    {
+      "test": "list_tasks (no filter)",
+      "success": true,
+      "details": "Found 65 tasks",
+      "timestamp": "2025-08-20T06:36:08.409542"
+    },
+    {
+      "test": "list_tasks (board filter)",
+      "success": true,
+      "details": "Found 55 tasks",
+      "timestamp": "2025-08-20T06:36:08.423411"
+    },
+    {
+      "test": "list_tasks (column filter)",
+      "success": true,
+      "details": "Found 30 tasks",
+      "timestamp": "2025-08-20T06:36:08.439425"
+    },
+    {
+      "test": "create_task",
+      "success": true,
+      "details": "Ticket 66 created successfully",
+      "timestamp": "2025-08-20T06:36:09.385918"
+    },
+    {
+      "test": "get_task",
+      "success": true,
+      "details": "All required fields present",
+      "timestamp": "2025-08-20T06:36:09.426659"
+    },
+    {
+      "test": "claim_task",
+      "success": true,
+      "details": "Ticket claimed by comprehensive_mcp_test_agent",
+      "timestamp": "2025-08-20T06:36:09.454525"
+    },
+    {
+      "test": "edit_task",
+      "success": true,
+      "details": "All fields updated correctly",
+      "timestamp": "2025-08-20T06:36:09.505730"
+    },
+    {
+      "test": "add_comment",
+      "success": true,
+      "details": "Comment added to ticket 66",
+      "timestamp": "2025-08-20T06:36:09.532876"
+    },
+    {
+      "test": "update_task_status",
+      "success": true,
+      "details": "Successfully moved through 3 columns",
+      "timestamp": "2025-08-20T06:36:09.623328"
+    }
+  ]
+}

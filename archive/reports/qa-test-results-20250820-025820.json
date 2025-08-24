@@ -1,0 +1,65 @@
+{
+  "timestamp": "2025-08-20T02:58:20.443030",
+  "summary": {
+    "total": 9,
+    "passed": 3,
+    "failed": 6,
+    "success_rate": 33.33333333333333
+  },
+  "results": [
+    {
+      "test": "Backend Health Check",
+      "status": "PASS",
+      "timestamp": "2025-08-20T02:58:20.369908",
+      "details": "Status: healthy"
+    },
+    {
+      "test": "Boards API",
+      "status": "PASS",
+      "timestamp": "2025-08-20T02:58:20.377078",
+      "details": "Found 3 boards"
+    },
+    {
+      "test": "Tickets API",
+      "status": "PASS",
+      "timestamp": "2025-08-20T02:58:20.384498",
+      "details": "Found 22 tickets in board 1"
+    },
+    {
+      "test": "Create Ticket",
+      "status": "FAIL",
+      "timestamp": "2025-08-20T02:58:20.424570",
+      "details": "HTTP 422: {\"error\":{\"message\":\"Request validation failed\",\"code\":\"VALIDATION_ERROR\",\"error_id\":\"err_1755658700423\",\"timestamp\":1755658700,\"validation_errors\":[{\"field\":\"body.board_id\",\"message\":\"Field required\",\"type\":\"missing\"}]}}"
+    },
+    {
+      "test": "Move Ticket API",
+      "status": "FAIL",
+      "timestamp": "2025-08-20T02:58:20.435592",
+      "details": "HTTP 405: {\"detail\":\"Method Not Allowed\"}"
+    },
+    {
+      "test": "Data Persistence Check",
+      "status": "FAIL",
+      "timestamp": "2025-08-20T02:58:20.435794",
+      "details": "Move operation failed"
+    },
+    {
+      "test": "Move Ticket API",
+      "status": "FAIL",
+      "timestamp": "2025-08-20T02:58:20.438929",
+      "details": "HTTP 405: {\"detail\":\"Method Not Allowed\"}"
+    },
+    {
+      "test": "Drag Drop Sequence",
+      "status": "FAIL",
+      "timestamp": "2025-08-20T02:58:20.439078",
+      "details": "Failed at step 1: In Progress"
+    },
+    {
+      "test": "Invalid Column Handling",
+      "status": "FAIL",
+      "timestamp": "2025-08-20T02:58:20.442711",
+      "details": "Unexpected response: 405"
+    }
+  ]
+}

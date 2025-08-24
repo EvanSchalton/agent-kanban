@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Browser Tab Simulation Test</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .tab-simulator { border: 2px solid #333; padding: 20px; margin: 20px 0; background: #f9f9f9; }
+        .tab-simulator.tab1 { border-color: #2196F3; }
+        .tab-simulator.tab2 { border-color: #4CAF50; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .success { background: #4CAF50; color: white; }
+        .error { background: #f44336; color: white; }
+        .warning { background: #FF9800; color: white; }
+        .log-entry { padding: 5px; margin: 2px 0; font-family: monospace; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🔄 QA Browser Tab Simulation - WebSocket Sync Test</h1>
+
+    <div class="tab-simulator tab1">
+        <h2>📱 Tab 1 (Creator)</h2>
+        <div id="tab1-status" class="status">Initializing...</div>
+        <button onclick="createCardInTab1()">Create Card in Tab 1</button>
+        <div id="tab1-cards"></div>
+        <div id="tab1-log"></div>
+    </div>
+
+    <div class="tab-simulator tab2">
+        <h2>📱 Tab 2 (Receiver)</h2>
+        <div id="tab2-status" class="status">Initializing...</div>
+        <div id="tab2-cards"></div>
+        <div id="tab2-log"></div>
+        <div id="sync-timer" class="status warning">Sync Time: Waiting...</div>
+    </div>
+
+    <div class="status" id="test-results">
+        <h3>Test Results</h3>
+        <div id="websocket-sync-result">WebSocket Sync: PENDING</div>
+        <div id="sync-time-result">Sync Time: PENDING</div>
+        <div id="board-isolation-result">Board Isolation: PENDING</div>
+        <div id="user-attribution-result">User Attribution: PENDING</div>
+    </div>
+
+    <script>
+        let socket1 = null;
+        let socket2 = null;
+        let syncStartTime = null;
+        let testResults = {
+            websocketSync: false,
+            syncTime: null,
+            boardIsolation: false,
+            userAttribution: false
+        };
+
+        function log(tabId, message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logDiv = document.getElementById(`${tabId}-log`);
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.style.color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'black';
+            entry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(entry);
+            console.log(`[${tabId}] ${message}`);
+        }
+
+        function updateStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+
+        // Initialize Tab 1 (Creator)
+        function initTab1() {
+            log('tab1', 'Connecting Tab 1 to WebSocket...');
+            socket1 = io('http://localhost:8000', {
+                transports: ['websocket', 'polling'],
+                query: { username: 'QA-Tab1' }
+            });
+
+            socket1.on('connect', () => {
+                updateStatus('tab1-status', '✅ Tab 1 Connected', 'success');
+                socket1.emit('join_board', { board_id: 1, username: 'QA-Tab1' });
+                log('tab1', 'Joined Board 1', 'success');
+            });
+
+            socket1.on('ticket_created', (data) => {
+                log('tab1', `Received ticket_created: ${data.title}`, 'success');
+                displayCard('tab1', data);
+            });
+
+            socket1.on('disconnect', () => {
+                updateStatus('tab1-status', '❌ Tab 1 Disconnected', 'error');
+            });
+        }
+
+        // Initialize Tab 2 (Receiver)
+        function initTab2() {
+            log('tab2', 'Connecting Tab 2 to WebSocket...');
+            socket2 = io('http://localhost:8000', {
+                transports: ['websocket', 'polling'],
+                query: { username: 'QA-Tab2' }
+            });
+
+            socket2.on('connect', () => {
+                updateStatus('tab2-status', '✅ Tab 2 Connected', 'success');
+                socket2.emit('join_board', { board_id: 1, username: 'QA-Tab2' });
+                log('tab2', 'Joined Board 1', 'success');
+            });
+
+            socket2.on('ticket_created', (data) => {
+                if (syncStartTime) {
+                    const syncTime = (Date.now() - syncStartTime) / 1000;
+                    testResults.syncTime = syncTime;
+                    testResults.websocketSync = true;
+
+                    updateStatus('sync-timer', `✅ Sync Time: ${syncTime.toFixed(3)}s`, syncTime < 2 ? 'success' : 'error');
+                    updateStatus('websocket-sync-result', `WebSocket Sync: PASS (${syncTime.toFixed(3)}s)`, 'success');
+                    updateStatus('sync-time-result', syncTime < 2 ? '✅ Sync Time: PASS (<2s)' : '❌ Sync Time: FAIL (>2s)', syncTime < 2 ? 'success' : 'error');
+
+                    log('tab2', `Received ticket_created in ${syncTime.toFixed(3)}s: ${data.title}`, 'success');
+                    syncStartTime = null;
+                }
+                displayCard('tab2', data);
+            });
+
+            socket2.on('disconnect', () => {
+                updateStatus('tab2-status', '❌ Tab 2 Disconnected', 'error');
+            });
+        }
+
+        function displayCard(tabId, card) {
+            const cardsDiv = document.getElementById(`${tabId}-cards`);
+            const cardElement = document.createElement('div');
+            cardElement.style.border = '1px solid #ccc';
+            cardElement.style.padding = '10px';
+            cardElement.style.margin = '5px 0';
+            cardElement.innerHTML = `
+                <strong>${card.title || card.id}</strong><br>
+                ${card.description || 'No description'}<br>
+                <small>Board: ${card.board_id} | Created: ${new Date().toLocaleTimeString()}</small>
+            `;
+            cardsDiv.appendChild(cardElement);
+        }
+
+        async function createCardInTab1() {
+            log('tab1', 'Creating card via API...');
+            syncStartTime = Date.now();
+
+            const cardData = {
+                title: `Tab1 Test Card ${Date.now()}`,
+                description: 'Testing WebSocket sync between tabs',
+                current_column: 'Not Started',
+                priority: 'high',
+                board_id: 1,
+                created_by: 'QA-Tab1'
+            };
+
+            try {
+                const response = await fetch('/api/tickets/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(cardData)
+                });
+
+                if (response.ok) {
+                    const card = await response.json();
+                    log('tab1', `Card created: ID ${card.id}`, 'success');
+
+                    // Check user attribution
+                    if (card.created_by === 'QA-Tab1' || card.assignee) {
+                        testResults.userAttribution = true;
+                        updateStatus('user-attribution-result', '✅ User Attribution: PASS', 'success');
+                    } else {
+                        updateStatus('user-attribution-result', '❌ User Attribution: FAIL (created_by not stored)', 'error');
+                    }
+                } else {
+                    log('tab1', `Card creation failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log('tab1', `Error creating card: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize both tabs on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                initTab1();
+                initTab2();
+            }, 1000);
+        });
+
+        // Auto-run test after 3 seconds
+        setTimeout(() => {
+            log('tab1', '🚀 Auto-running WebSocket sync test...', 'warning');
+            createCardInTab1();
+        }, 4000);
+    </script>
+</body>
+</html>

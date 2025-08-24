@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Drag Drop Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background: #f5f5f5;
+        }
+        .result {
+            padding: 10px;
+            margin: 10px 0;
+            background: white;
+            border-radius: 4px;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Drag Drop API Debug Test</h1>
+
+    <div class="test-section">
+        <h2>Test 1: Get Board and Tickets</h2>
+        <button onclick="getBoard()">Get Board Info</button>
+        <div id="board-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Test Move API</h2>
+        <label>Ticket ID: <input type="text" id="ticket-id" value="1" /></label>
+        <label>Target Column:
+            <select id="target-column">
+                <option value="Not Started">Not Started</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Blocked">Blocked</option>
+                <option value="Ready for QC">Ready for QC</option>
+                <option value="Done">Done</option>
+            </select>
+        </label>
+        <button onclick="testMove()">Test Move</button>
+        <div id="move-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Frontend API Integration</h2>
+        <button onclick="testFrontendAPI()">Test Frontend Move Function</button>
+        <div id="frontend-result" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:18000';
+        const FRONTEND_BASE = 'http://localhost:5173';
+
+        async function getBoard() {
+            const resultDiv = document.getElementById('board-result');
+            try {
+                const response = await fetch(`${API_BASE}/api/boards/`);
+                const boards = await response.json();
+
+                if (boards.length > 0) {
+                    const board = boards[0];
+                    const ticketsResponse = await fetch(`${API_BASE}/api/tickets/?board_id=${board.id}`);
+                    const ticketsData = await ticketsResponse.json();
+                    const tickets = ticketsData.items || [];
+
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ Board Found: ${board.name}</div>
+                        <div>Board ID: ${board.id}</div>
+                        <div>Total Tickets: ${tickets.length}</div>
+                        ${tickets.slice(0, 5).map(t => `
+                            <div>• Ticket #${t.id}: "${t.title}" in ${t.current_column}</div>
+                        `).join('')}
+                    `;
+                } else {
+                    resultDiv.innerHTML = '<div class="error">No boards found</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function testMove() {
+            const resultDiv = document.getElementById('move-result');
+            const ticketId = document.getElementById('ticket-id').value;
+            const targetColumn = document.getElementById('target-column').value;
+
+            try {
+                // First get current state
+                const getResponse = await fetch(`${API_BASE}/api/tickets/${ticketId}`);
+                if (!getResponse.ok) throw new Error('Ticket not found');
+                const ticket = await getResponse.json();
+
+                resultDiv.innerHTML = `<div>Moving ticket from ${ticket.current_column} to ${targetColumn}...</div>`;
+
+                // Try to move
+                const moveResponse = await fetch(`${API_BASE}/api/tickets/${ticketId}/move`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ column: targetColumn })
+                });
+
+                if (!moveResponse.ok) {
+                    const error = await moveResponse.text();
+                    throw new Error(error);
+                }
+
+                const movedTicket = await moveResponse.json();
+
+                // Verify move
+                const verifyResponse = await fetch(`${API_BASE}/api/tickets/${ticketId}`);
+                const verifiedTicket = await verifyResponse.json();
+
+                resultDiv.innerHTML = `
+                    <div class="success">✅ Move Successful!</div>
+                    <div>Ticket #${ticketId} moved to ${movedTicket.current_column}</div>
+                    <div>Verified: ${verifiedTicket.current_column === targetColumn ? '✅' : '❌'}</div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        async function testFrontendAPI() {
+            const resultDiv = document.getElementById('frontend-result');
+
+            try {
+                // Import and test the frontend API module
+                resultDiv.innerHTML = '<div>Testing frontend API integration...</div>';
+
+                // We'll simulate what the frontend does
+                const COLUMN_MAP = {
+                    'not_started': 'Not Started',
+                    'in_progress': 'In Progress',
+                    'blocked': 'Blocked',
+                    'ready_for_qc': 'Ready for QC',
+                    'done': 'Done'
+                };
+
+                // Get a ticket to test with
+                const boardsResponse = await fetch(`${API_BASE}/api/boards/`);
+                const boards = await boardsResponse.json();
+                const boardId = boards[0].id;
+
+                const ticketsResponse = await fetch(`${API_BASE}/api/tickets/?board_id=${boardId}`);
+                const ticketsData = await ticketsResponse.json();
+                const ticket = ticketsData.items[0];
+
+                if (!ticket) {
+                    throw new Error('No tickets found to test with');
+                }
+
+                // Test the transformation
+                const fromColumnId = 'not_started';
+                const toColumnId = 'in_progress';
+                const columnName = COLUMN_MAP[toColumnId];
+
+                resultDiv.innerHTML = `
+                    <div>Testing column ID transformation:</div>
+                    <div>From column_id: ${fromColumnId}</div>
+                    <div>To column_id: ${toColumnId}</div>
+                    <div>Mapped to: ${columnName}</div>
+                    <div>Ticket ID: ${ticket.id}</div>
+                    <hr>
+                `;
+
+                // Test actual move
+                const moveResponse = await fetch(`${API_BASE}/api/tickets/${ticket.id}/move`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ column: columnName })
+                });
+
+                if (moveResponse.ok) {
+                    const movedTicket = await moveResponse.json();
+                    resultDiv.innerHTML += `
+                        <div class="success">✅ Frontend API pattern works!</div>
+                        <div>Column mapping is correct</div>
+                        <div>Ticket moved to: ${movedTicket.current_column}</div>
+                    `;
+                } else {
+                    throw new Error('Move failed');
+                }
+
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Run initial test
+        getBoard();
+    </script>
+</body>
+</html>

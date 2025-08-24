@@ -1,0 +1,154 @@
+name: Version Bump
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+      - '.gitignore'
+      - '.github/workflows/**'
+      - 'tests/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  version-bump:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, 'bump version')"
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install bump2version semver gitpython
+
+    - name: Configure git
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+    - name: Determine version bump type
+      id: bump-type
+      run: |
+        # Analyze commit messages to determine bump type
+        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+        echo "Last tag: $LAST_TAG"
+
+        # Default to patch bump
+        BUMP_TYPE="patch"
+
+        # Check commit messages since last tag
+        if git log ${LAST_TAG}..HEAD --pretty=format:"%s" | grep -qE "^(feat|feature):"; then
+          BUMP_TYPE="minor"
+        fi
+
+        if git log ${LAST_TAG}..HEAD --pretty=format:"%s" | grep -qE "^BREAKING CHANGE:|^.*!:"; then
+          BUMP_TYPE="major"
+        fi
+
+        echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+        echo "Determined bump type: $BUMP_TYPE"
+
+    - name: Get current version
+      id: current-version
+      run: |
+        if [ -f pyproject.toml ]; then
+          VERSION=$(grep -E "^version = " pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+        elif [ -f backend/pyproject.toml ]; then
+          VERSION=$(grep -E "^version = " backend/pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+        elif [ -f VERSION ]; then
+          VERSION=$(cat VERSION)
+        else
+          VERSION="0.1.0"
+        fi
+        echo "current_version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Current version: $VERSION"
+
+    - name: Calculate new version
+      id: new-version
+      run: |
+        python -c "
+import semver
+import sys
+
+current = '${{ steps.current-version.outputs.current_version }}'
+bump_type = '${{ steps.bump-type.outputs.bump_type }}'
+
+try:
+    version = semver.VersionInfo.parse(current)
+    if bump_type == 'major':
+        new_version = version.bump_major()
+    elif bump_type == 'minor':
+        new_version = version.bump_minor()
+    else:
+        new_version = version.bump_patch()
+    print(f'new_version={new_version}')
+except Exception as e:
+    print(f'Error parsing version: {e}', file=sys.stderr)
+    print('new_version=0.1.1')
+        " >> $GITHUB_OUTPUT
+
+    - name: Update version in pyproject.toml
+      run: |
+        NEW_VERSION="${{ steps.new-version.outputs.new_version }}"
+
+        # Update root pyproject.toml if it exists
+        if [ -f pyproject.toml ]; then
+          sed -i "s/^version = .*/version = \"$NEW_VERSION\"/" pyproject.toml
+        fi
+
+        # Update backend pyproject.toml if it exists
+        if [ -f backend/pyproject.toml ]; then
+          sed -i "s/^version = .*/version = \"$NEW_VERSION\"/" backend/pyproject.toml
+        fi
+
+        # Update frontend package.json if it exists
+        if [ -f frontend/package.json ]; then
+          sed -i "s/\"version\": \".*\"/\"version\": \"$NEW_VERSION\"/" frontend/package.json
+        fi
+
+        # Update VERSION file if it exists
+        if [ -f VERSION ]; then
+          echo "$NEW_VERSION" > VERSION
+        fi
+
+    - name: Create version bump commit
+      run: |
+        NEW_VERSION="${{ steps.new-version.outputs.new_version }}"
+        git add -A
+        git diff --staged --quiet || git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
+
+    - name: Create and push tag
+      run: |
+        NEW_VERSION="${{ steps.new-version.outputs.new_version }}"
+        git tag -a "v$NEW_VERSION" -m "Release version $NEW_VERSION"
+        git push origin main --follow-tags
+
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.new-version.outputs.new_version }}
+        release_name: Release ${{ steps.new-version.outputs.new_version }}
+        body: |
+          ## Changes in this release
+
+          ### Version bump type: ${{ steps.bump-type.outputs.bump_type }}
+
+          View the [full changelog](https://github.com/${{ github.repository }}/compare/${{ steps.current-version.outputs.current_version }}...v${{ steps.new-version.outputs.new_version }})
+        draft: false
+        prerelease: false

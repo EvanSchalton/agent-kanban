@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socket.IO Real-time Sync Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .connected { background-color: #d4edda; color: #155724; }
+        .disconnected { background-color: #f8d7da; color: #721c24; }
+        .message { padding: 5px; margin: 5px 0; background-color: #f8f9fa; border-left: 3px solid #007bff; }
+        .realtime { background-color: #fff3cd; border-left-color: #ffc107; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        .log { height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; }
+    </style>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Socket.IO Real-time Sync Test</h1>
+
+    <div id="status" class="status disconnected">Disconnected</div>
+
+    <div>
+        <button onclick="connectSocketIO()">Connect Socket.IO</button>
+        <button onclick="disconnectSocketIO()">Disconnect</button>
+        <button onclick="joinBoard(1)">Join Board 1</button>
+        <button onclick="testCardCreation()">Create Card + Monitor Sync</button>
+        <button onclick="testTicketMove()">Move Ticket + Monitor Sync</button>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <h3>Real-time Event Log:</h3>
+    <div id="log" class="log"></div>
+
+    <script>
+        let socket = null;
+        let isConnected = false;
+
+        function log(message, isRealtime = false) {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = isRealtime ? 'message realtime' : 'message';
+            logEntry.innerHTML = `<strong>[${time}]</strong> ${message}`;
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(`[${time}] ${message}`);
+        }
+
+        function updateStatus(connected) {
+            const statusDiv = document.getElementById('status');
+            isConnected = connected;
+            if (connected) {
+                statusDiv.textContent = 'Connected to Socket.IO';
+                statusDiv.className = 'status connected';
+            } else {
+                statusDiv.textContent = 'Disconnected from Socket.IO';
+                statusDiv.className = 'status disconnected';
+            }
+        }
+
+        function connectSocketIO() {
+            if (socket && socket.connected) {
+                log('Socket.IO already connected');
+                return;
+            }
+
+            log('Connecting to Socket.IO at :18000...');
+
+            socket = io('http://localhost:18000', {
+                transports: ['websocket', 'polling']
+            });
+
+            socket.on('connect', () => {
+                log('✅ Socket.IO Connected!');
+                updateStatus(true);
+            });
+
+            socket.on('connected', (data) => {
+                log(`🎉 Connection confirmed: ${JSON.stringify(data)}`);
+            });
+
+            socket.on('ticket_created', (data) => {
+                log(`🎫 REAL-TIME SYNC: New ticket created!`, true);
+                log(`   Title: "${data.ticket.title}"`, true);
+                log(`   Board: ${data.board_id}`, true);
+            });
+
+            socket.on('ticket_updated', (data) => {
+                log(`📝 REAL-TIME SYNC: Ticket updated!`, true);
+                log(`   Title: "${data.ticket.title}"`, true);
+                log(`   Board: ${data.board_id}`, true);
+            });
+
+            socket.on('ticket_moved', (data) => {
+                log(`↗️ REAL-TIME SYNC: Ticket moved!`, true);
+                log(`   ID: ${data.ticket.id} → Column: ${data.ticket.current_column}`, true);
+                log(`   Board: ${data.board_id}`, true);
+            });
+
+            socket.on('joined_board', (data) => {
+                log(`📋 Joined board: ${data.board_id}`);
+            });
+
+            socket.on('disconnect', () => {
+                log('🔌 Socket.IO Disconnected');
+                updateStatus(false);
+            });
+
+            socket.on('error', (error) => {
+                log(`❌ Socket.IO Error: ${JSON.stringify(error)}`);
+            });
+
+            // Handle all other events
+            socket.onAny((event, ...args) => {
+                if (!['connect', 'disconnect', 'connected', 'joined_board', 'ticket_created', 'ticket_updated', 'ticket_moved', 'error'].includes(event)) {
+                    log(`📡 Socket.IO Event: ${event} - ${JSON.stringify(args)}`);
+                }
+            });
+        }
+
+        function disconnectSocketIO() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+                log('Socket.IO disconnected manually');
+                updateStatus(false);
+            }
+        }
+
+        function joinBoard(boardId) {
+            if (socket && socket.connected) {
+                log(`Joining board ${boardId}...`);
+                socket.emit('join_board', { board_id: boardId });
+            } else {
+                log('❌ Not connected to Socket.IO');
+            }
+        }
+
+        async function testCardCreation() {
+            log('🧪 Testing Card Creation + Real-time Sync...');
+
+            try {
+                const response = await fetch('http://localhost:18000/api/tickets/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: 'Real-time Test Card ' + Math.floor(Math.random() * 1000),
+                        description: 'Testing Socket.IO real-time synchronization',
+                        board_id: 1,
+                        current_column: 'Not Started'
+                    })
+                });
+
+                if (response.ok) {
+                    const ticket = await response.json();
+                    log(`✅ Card created via API: ID ${ticket.id}, Title: "${ticket.title}"`);
+                    log('🕐 Waiting for Socket.IO real-time update...');
+                } else {
+                    const error = await response.text();
+                    log(`❌ Card creation failed: ${response.status} - ${error}`);
+                }
+            } catch (error) {
+                log(`❌ Network error during card creation: ${error.message}`);
+            }
+        }
+
+        async function testTicketMove() {
+            log('🧪 Testing Ticket Move + Real-time Sync...');
+
+            try {
+                // First get a ticket to move
+                const ticketsResponse = await fetch('http://localhost:18000/api/boards/1/tickets');
+                const ticketsData = await ticketsResponse.json();
+                const tickets = ticketsData.tickets || [];
+
+                if (tickets.length === 0) {
+                    log('❌ No tickets found to move. Create a ticket first.');
+                    return;
+                }
+
+                const ticket = tickets[0];
+                log(`📋 Moving ticket: ID ${ticket.id}, Current: "${ticket.current_column}"`);
+
+                const response = await fetch(`http://localhost:18000/api/tickets/${ticket.id}/move`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        column: 'In Progress'
+                    })
+                });
+
+                if (response.ok) {
+                    const movedTicket = await response.json();
+                    log(`✅ Ticket moved via API: ID ${movedTicket.id} → "${movedTicket.current_column}"`);
+                    log('🕐 Waiting for Socket.IO real-time update...');
+                } else {
+                    const error = await response.text();
+                    log(`❌ Ticket move failed: ${response.status} - ${error}`);
+                }
+            } catch (error) {
+                log(`❌ Network error during ticket move: ${error.message}`);
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        // Auto-connect and join board on page load
+        window.onload = function() {
+            log('🚀 Socket.IO Real-time Sync Test Ready');
+            log('Testing automatic connection...');
+            connectSocketIO();
+            setTimeout(() => {
+                if (socket && socket.connected) {
+                    joinBoard(1);
+                }
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

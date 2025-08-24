@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Collaboration Demo - MCP Kanban Board</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .demo-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .demo-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .demo-header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .agents-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .agent-window {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .agent-header {
+            padding: 20px;
+            color: white;
+            position: relative;
+        }
+
+        .agent1 .agent-header { background: linear-gradient(135deg, #42a5f5, #1976d2); }
+        .agent2 .agent-header { background: linear-gradient(135deg, #66bb6a, #43a047); }
+
+        .agent-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .agent-role {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .agent-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 5px 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 0.85em;
+        }
+
+        .agent-status.online {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .agent-content {
+            padding: 20px;
+            height: 500px;
+            overflow-y: auto;
+        }
+
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .column {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 10px;
+            min-height: 150px;
+        }
+
+        .column-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding: 5px;
+            background: white;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 0.85em;
+        }
+
+        .ticket {
+            background: white;
+            border-radius: 5px;
+            padding: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .ticket:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .ticket-title {
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-bottom: 4px;
+        }
+
+        .ticket-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75em;
+            color: #666;
+        }
+
+        .ticket-id {
+            background: #e0e0e0;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .ticket-assignee {
+            color: #1976d2;
+            font-weight: 500;
+        }
+
+        .agent-actions {
+            padding: 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn.primary {
+            background: #1976d2;
+            color: white;
+        }
+
+        .action-btn.success {
+            background: #43a047;
+            color: white;
+        }
+
+        .action-btn.warning {
+            background: #ffa726;
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .activity-log {
+            background: #f0f0f0;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 5px;
+            margin: 3px 0;
+            background: white;
+            border-radius: 4px;
+            font-size: 0.85em;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .log-entry.create { border-left: 3px solid #4caf50; }
+        .log-entry.move { border-left: 3px solid #2196f3; }
+        .log-entry.update { border-left: 3px solid #ff9800; }
+        .log-entry.claim { border-left: 3px solid #9c27b0; }
+
+        .demo-controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .demo-btn {
+            padding: 12px 30px;
+            margin: 0 10px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .demo-btn.running {
+            background: #4caf50;
+            color: white;
+            animation: pulse 1s infinite;
+        }
+
+        .ticket.highlight {
+            animation: highlight 1s ease;
+        }
+
+        @keyframes highlight {
+            0%, 100% { background: white; }
+            50% { background: #fff59d; }
+        }
+
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #1976d2;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-header">
+        <h1>🤖 Agent Collaboration Demo</h1>
+        <p>Watch AI agents collaborate in real-time using MCP to manage kanban tickets</p>
+    </div>
+
+    <div class="demo-controls">
+        <button class="demo-btn" onclick="startDemo()">🚀 Start Collaboration Demo</button>
+        <button class="demo-btn" onclick="pauseDemo()">⏸️ Pause</button>
+        <button class="demo-btn" onclick="resetDemo()">🔄 Reset Board</button>
+    </div>
+
+    <div class="agents-container">
+        <!-- Agent 1: Development Agent -->
+        <div class="agent-window agent1">
+            <div class="agent-header">
+                <div class="agent-name">Agent Alpha</div>
+                <div class="agent-role">Development Agent</div>
+                <div class="agent-status online">● Online</div>
+            </div>
+
+            <div class="agent-content">
+                <div class="stats-panel">
+                    <div class="stat-card">
+                        <div class="stat-value" id="agent1-created">0</div>
+                        <div class="stat-label">Created</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="agent1-claimed">0</div>
+                        <div class="stat-label">Claimed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="agent1-moved">0</div>
+                        <div class="stat-label">Moved</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="agent1-completed">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                </div>
+
+                <div class="kanban-board" id="board1">
+                    <div class="column" data-column="not_started">
+                        <div class="column-header">Not Started</div>
+                        <div class="column-tickets"></div>
+                    </div>
+                    <div class="column" data-column="in_progress">
+                        <div class="column-header">In Progress</div>
+                        <div class="column-tickets"></div>
+                    </div>
+                    <div class="column" data-column="blocked">
+                        <div class="column-header">Blocked</div>
+                        <div class="column-tickets"></div>
+                    </div>
+                    <div class="column" data-column="ready_for_qc">
+                        <div class="column-header">Ready for QC</div>
+                        <div class="column-tickets"></div>
+                    </div>
+                    <div class="column" data-column="done">
+                        <div class="column-header">Done</div>
+                        <div class="column-tickets"></div>
+                    </div>
+                </div>
+
+                <div class="activity-log" id="log1">
+                    <div class="log-entry">Agent Alpha initialized and ready</div>
+                </div>
+            </div>
+
+            <div class="agent-actions">
+                <button class="action-btn primary" onclick="agent1CreateTask()">Create Task</button>
+                <button class="action-btn success" onclick="agent1ClaimTask()">Claim Next</button>
+                <button class="action-btn warning" onclick="agent1MoveTask()">Move to Progress</button>
+            </div>
+        </div>
+
+        <!-- Agent 2: QA Agent -->
+        <div class="agent-window agent2">
+            <div class="agent-header">
+                <div class="agent-name">Agent Beta</div>
+                <div class="agent-role">QA Review Agent</div>
+                <div class="agent-status online">● Online</div>
+            </div>
+
+            <div class="agent-content">
+                <div class="stats-panel">
+                    <div class="stat-card">
+                        <div class="stat-value" id="agent2-reviewed">0</div>
+                        <div class="stat-label">Reviewed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="agent2-approved">0</div>
+                        <div class="stat-label">Approved</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="agent2-blocked">0</div>
+                        <div class="stat-label">Blocked</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="agent2-completed">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                </div>
+
+                <div class="kanban-board" id="board2">
+                    <div class="column" data-column="not_started">
+                        <div class="column-header">Not Started</div>
+                        <div class="column-tickets"></div>
+                    </div>
+                    <div class="column" data-column="in_progress">
+                        <div class="column-header">In Progress</div>
+                        <div class="column-tickets"></div>
+                    </div>
+                    <div class="column" data-column="blocked">
+                        <div class="column-header">Blocked</div>
+                        <div class="column-tickets"></div>
+                    </div>
+                    <div class="column" data-column="ready_for_qc">
+                        <div class="column-header">Ready for QC</div>
+                        <div class="column-tickets"></div>
+                    </div>
+                    <div class="column" data-column="done">
+                        <div class="column-header">Done</div>
+                        <div class="column-tickets"></div>
+                    </div>
+                </div>
+
+                <div class="activity-log" id="log2">
+                    <div class="log-entry">Agent Beta initialized and monitoring</div>
+                </div>
+            </div>
+
+            <div class="agent-actions">
+                <button class="action-btn primary" onclick="agent2ReviewTask()">Review QC Task</button>
+                <button class="action-btn success" onclick="agent2ApproveTask()">Approve Task</button>
+                <button class="action-btn warning" onclick="agent2BlockTask()">Block Task</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // WebSocket connections for both agents
+        let ws1 = null;
+        let ws2 = null;
+        let boardId = 1;
+        let tickets = [];
+        let demoRunning = false;
+        let taskCounter = 1;
+
+        // Stats tracking
+        let stats = {
+            agent1: { created: 0, claimed: 0, moved: 0, completed: 0 },
+            agent2: { reviewed: 0, approved: 0, blocked: 0, completed: 0 }
+        };
+
+        // Connect WebSocket for real-time updates
+        function connectWebSockets() {
+            // Agent 1 WebSocket
+            ws1 = new WebSocket('ws://localhost:18000/ws/connect');
+
+            ws1.onopen = () => {
+                console.log('Agent 1 WebSocket connected');
+                ws1.send(JSON.stringify({ type: 'connection_init', user: 'agent_alpha' }));
+                addLog('log1', '🔌 Connected to WebSocket', 'create');
+            };
+
+            ws1.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data, 'board1', 'log1');
+            };
+
+            // Agent 2 WebSocket
+            ws2 = new WebSocket('ws://localhost:18000/ws/connect');
+
+            ws2.onopen = () => {
+                console.log('Agent 2 WebSocket connected');
+                ws2.send(JSON.stringify({ type: 'connection_init', user: 'agent_beta' }));
+                addLog('log2', '🔌 Connected to WebSocket', 'create');
+            };
+
+            ws2.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data, 'board2', 'log2');
+            };
+        }
+
+        // Handle WebSocket messages
+        function handleWebSocketMessage(data, boardId, logId) {
+            if (data.event === 'ticket_created') {
+                addLog(logId, `📝 New ticket created: ${data.data.title}`, 'create');
+                loadBoard();
+            } else if (data.event === 'ticket_updated') {
+                addLog(logId, `✏️ Ticket updated: #${data.data.id}`, 'update');
+                loadBoard();
+            } else if (data.event === 'ticket_moved') {
+                addLog(logId, `➡️ Ticket moved to ${data.data.to_column}`, 'move');
+                loadBoard();
+            } else if (data.event === 'ticket_deleted') {
+                addLog(logId, `🗑️ Ticket deleted: #${data.data.id}`, 'update');
+                loadBoard();
+            }
+        }
+
+        // Load board state
+        async function loadBoard() {
+            try {
+                const response = await fetch(`/api/boards/${boardId}/tickets`);
+                const data = await response.json();
+                tickets = data.tickets || [];
+                renderBoards();
+            } catch (error) {
+                console.error('Failed to load board:', error);
+            }
+        }
+
+        // Render both boards
+        function renderBoards() {
+            renderBoard('board1');
+            renderBoard('board2');
+        }
+
+        // Render a single board
+        function renderBoard(boardId) {
+            const columns = document.querySelectorAll(`#${boardId} .column`);
+
+            columns.forEach(column => {
+                const columnName = column.dataset.column;
+                const ticketsContainer = column.querySelector('.column-tickets');
+                ticketsContainer.innerHTML = '';
+
+                // Map column IDs to display names
+                const columnMap = {
+                    'not_started': 'Not Started',
+                    'in_progress': 'In Progress',
+                    'blocked': 'Blocked',
+                    'ready_for_qc': 'Ready for QC',
+                    'done': 'Done'
+                };
+
+                const columnTickets = tickets.filter(t =>
+                    t.current_column === columnMap[columnName]
+                );
+
+                columnTickets.forEach(ticket => {
+                    const ticketEl = document.createElement('div');
+                    ticketEl.className = 'ticket';
+                    ticketEl.innerHTML = `
+                        <div class="ticket-title">${ticket.title}</div>
+                        <div class="ticket-meta">
+                            <span class="ticket-id">#${ticket.id}</span>
+                            <span class="ticket-assignee">${ticket.assignee || 'Unassigned'}</span>
+                        </div>
+                    `;
+                    ticketsContainer.appendChild(ticketEl);
+
+                    // Highlight new tickets
+                    setTimeout(() => ticketEl.classList.add('highlight'), 100);
+                });
+            });
+        }
+
+        // Add log entry
+        function addLog(logId, message, type = '') {
+            const log = document.getElementById(logId);
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.insertBefore(entry, log.firstChild);
+
+            // Keep only last 10 entries
+            while (log.children.length > 10) {
+                log.removeChild(log.lastChild);
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            document.getElementById('agent1-created').textContent = stats.agent1.created;
+            document.getElementById('agent1-claimed').textContent = stats.agent1.claimed;
+            document.getElementById('agent1-moved').textContent = stats.agent1.moved;
+            document.getElementById('agent1-completed').textContent = stats.agent1.completed;
+
+            document.getElementById('agent2-reviewed').textContent = stats.agent2.reviewed;
+            document.getElementById('agent2-approved').textContent = stats.agent2.approved;
+            document.getElementById('agent2-blocked').textContent = stats.agent2.blocked;
+            document.getElementById('agent2-completed').textContent = stats.agent2.completed;
+        }
+
+        // Agent 1 Actions (Development Agent)
+        async function agent1CreateTask() {
+            const taskNames = [
+                'Implement user authentication',
+                'Add database migration',
+                'Create API endpoint',
+                'Fix performance issue',
+                'Update documentation',
+                'Refactor legacy code',
+                'Add unit tests',
+                'Implement caching layer'
+            ];
+
+            const taskName = taskNames[Math.floor(Math.random() * taskNames.length)];
+
+            try {
+                const response = await fetch('/api/tickets/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: `${taskName} #${taskCounter++}`,
+                        description: 'Created by Agent Alpha via MCP',
+                        board_id: boardId,
+                        current_column: 'Not Started',
+                        priority: Math.random() > 0.5 ? '2.0' : '3.0'
+                    })
+                });
+
+                if (response.ok) {
+                    const ticket = await response.json();
+                    addLog('log1', `✅ Created: ${ticket.title}`, 'create');
+                    stats.agent1.created++;
+                    updateStats();
+                    loadBoard();
+                }
+            } catch (error) {
+                addLog('log1', `❌ Failed to create task: ${error.message}`, 'error');
+            }
+        }
+
+        async function agent1ClaimTask() {
+            // Find unassigned tickets
+            const unassigned = tickets.filter(t => !t.assignee && t.current_column === 'Not Started');
+
+            if (unassigned.length > 0) {
+                const ticket = unassigned[0];
+
+                try {
+                    const response = await fetch(`/api/tickets/${ticket.id}/claim?agent_id=agent_alpha`, {
+                        method: 'POST'
+                    });
+
+                    if (response.ok) {
+                        addLog('log1', `👤 Claimed ticket #${ticket.id}: ${ticket.title}`, 'claim');
+                        stats.agent1.claimed++;
+                        updateStats();
+                        loadBoard();
+                    }
+                } catch (error) {
+                    addLog('log1', `❌ Failed to claim task: ${error.message}`, 'error');
+                }
+            } else {
+                addLog('log1', '⚠️ No unassigned tasks available', 'update');
+            }
+        }
+
+        async function agent1MoveTask() {
+            // Find tickets assigned to agent1 that aren't done
+            const myTickets = tickets.filter(t =>
+                t.assignee === 'agent_alpha' &&
+                t.current_column !== 'Done' &&
+                t.current_column !== 'Ready for QC'
+            );
+
+            if (myTickets.length > 0) {
+                const ticket = myTickets[0];
+                let nextColumn = 'In Progress';
+
+                if (ticket.current_column === 'In Progress') {
+                    nextColumn = 'Ready for QC';
+                }
+
+                try {
+                    const response = await fetch(`/api/tickets/${ticket.id}/move`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            column: nextColumn,
+                            moved_by: 'agent_alpha'
+                        })
+                    });
+
+                    if (response.ok) {
+                        addLog('log1', `➡️ Moved #${ticket.id} to ${nextColumn}`, 'move');
+                        stats.agent1.moved++;
+                        if (nextColumn === 'Ready for QC') {
+                            stats.agent1.completed++;
+                        }
+                        updateStats();
+                        loadBoard();
+                    }
+                } catch (error) {
+                    addLog('log1', `❌ Failed to move task: ${error.message}`, 'error');
+                }
+            } else {
+                addLog('log1', '⚠️ No tasks to move', 'update');
+            }
+        }
+
+        // Agent 2 Actions (QA Agent)
+        async function agent2ReviewTask() {
+            // Find tickets in Ready for QC
+            const qcTickets = tickets.filter(t => t.current_column === 'Ready for QC');
+
+            if (qcTickets.length > 0) {
+                const ticket = qcTickets[0];
+
+                // Add a comment
+                try {
+                    const response = await fetch('/api/comments/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ticket_id: ticket.id,
+                            text: 'Reviewing ticket for quality assurance',
+                            author: 'agent_beta'
+                        })
+                    });
+
+                    if (response.ok) {
+                        addLog('log2', `🔍 Reviewing ticket #${ticket.id}: ${ticket.title}`, 'update');
+                        stats.agent2.reviewed++;
+                        updateStats();
+                    }
+                } catch (error) {
+                    addLog('log2', `❌ Failed to review task: ${error.message}`, 'error');
+                }
+            } else {
+                addLog('log2', '⚠️ No tickets ready for QC', 'update');
+            }
+        }
+
+        async function agent2ApproveTask() {
+            // Find tickets in Ready for QC
+            const qcTickets = tickets.filter(t => t.current_column === 'Ready for QC');
+
+            if (qcTickets.length > 0) {
+                const ticket = qcTickets[0];
+
+                try {
+                    const response = await fetch(`/api/tickets/${ticket.id}/move`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            column: 'Done',
+                            moved_by: 'agent_beta'
+                        })
+                    });
+
+                    if (response.ok) {
+                        addLog('log2', `✅ Approved #${ticket.id}: ${ticket.title}`, 'create');
+                        stats.agent2.approved++;
+                        stats.agent2.completed++;
+                        updateStats();
+                        loadBoard();
+                    }
+                } catch (error) {
+                    addLog('log2', `❌ Failed to approve task: ${error.message}`, 'error');
+                }
+            } else {
+                addLog('log2', '⚠️ No tickets to approve', 'update');
+            }
+        }
+
+        async function agent2BlockTask() {
+            // Find tickets in Ready for QC or In Progress
+            const blockableTickets = tickets.filter(t =>
+                t.current_column === 'Ready for QC' || t.current_column === 'In Progress'
+            );
+
+            if (blockableTickets.length > 0) {
+                const ticket = blockableTickets[0];
+
+                try {
+                    // Move to blocked
+                    const response = await fetch(`/api/tickets/${ticket.id}/move`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            column: 'Blocked',
+                            moved_by: 'agent_beta'
+                        })
+                    });
+
+                    if (response.ok) {
+                        // Add comment explaining block
+                        await fetch('/api/comments/', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                ticket_id: ticket.id,
+                                text: 'Blocked: Requires additional review or fixes',
+                                author: 'agent_beta'
+                            })
+                        });
+
+                        addLog('log2', `🚫 Blocked #${ticket.id}: ${ticket.title}`, 'update');
+                        stats.agent2.blocked++;
+                        updateStats();
+                        loadBoard();
+                    }
+                } catch (error) {
+                    addLog('log2', `❌ Failed to block task: ${error.message}`, 'error');
+                }
+            } else {
+                addLog('log2', '⚠️ No tickets to block', 'update');
+            }
+        }
+
+        // Demo automation
+        async function startDemo() {
+            if (demoRunning) return;
+
+            demoRunning = true;
+            document.querySelector('.demo-btn').classList.add('running');
+
+            addLog('log1', '🚀 Starting automated collaboration', 'create');
+            addLog('log2', '🚀 Starting automated monitoring', 'create');
+
+            // Simulate agent collaboration
+            const demoSequence = async () => {
+                if (!demoRunning) return;
+
+                // Random action selection
+                const actions = [
+                    () => agent1CreateTask(),
+                    () => agent1ClaimTask(),
+                    () => agent1MoveTask(),
+                    () => agent2ReviewTask(),
+                    () => agent2ApproveTask(),
+                    () => Math.random() > 0.8 && agent2BlockTask()
+                ];
+
+                const action = actions[Math.floor(Math.random() * actions.length)];
+                await action();
+
+                // Continue demo
+                if (demoRunning) {
+                    setTimeout(demoSequence, 2000 + Math.random() * 3000);
+                }
+            };
+
+            demoSequence();
+        }
+
+        function pauseDemo() {
+            demoRunning = false;
+            document.querySelector('.demo-btn').classList.remove('running');
+            addLog('log1', '⏸️ Demo paused', 'update');
+            addLog('log2', '⏸️ Demo paused', 'update');
+        }
+
+        async function resetDemo() {
+            pauseDemo();
+
+            // Clear stats
+            stats = {
+                agent1: { created: 0, claimed: 0, moved: 0, completed: 0 },
+                agent2: { reviewed: 0, approved: 0, blocked: 0, completed: 0 }
+            };
+            updateStats();
+
+            // Clear logs
+            document.getElementById('log1').innerHTML = '<div class="log-entry">Agent Alpha reset and ready</div>';
+            document.getElementById('log2').innerHTML = '<div class="log-entry">Agent Beta reset and ready</div>';
+
+            // Reload board
+            loadBoard();
+        }
+
+        // Initialize on load
+        window.onload = () => {
+            connectWebSockets();
+            loadBoard();
+
+            // Refresh board periodically
+            setInterval(loadBoard, 5000);
+        };
+    </script>
+</body>
+</html>

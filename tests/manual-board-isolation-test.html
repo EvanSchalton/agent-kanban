@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔴 CRITICAL P0: Board Isolation Manual Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .critical-warning {
+            background: #fee;
+            border: 2px solid #f88;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .test-step {
+            background: #f0f8ff;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+        .console-output {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin: 10px 0;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .pass { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .fail { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .pending { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .api-call {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="critical-warning">
+        <h1>🔴 CRITICAL P0: Board Isolation Data Corruption Test</h1>
+        <p><strong>Bug:</strong> All boards showing same cards due to backend not filtering by board_id</p>
+        <p><strong>Impact:</strong> Users see tickets from other boards = DATA CORRUPTION</p>
+        <p><strong>Debug Status:</strong> FE-Dev added debug logs to Board.tsx line 24 and api.ts lines 149-152</p>
+    </div>
+
+    <div class="test-container">
+        <h2>📋 Manual Test Instructions</h2>
+
+        <div class="test-step">
+            <h3>Step 1: Open Browser Dev Tools</h3>
+            <p>Press F12 or right-click → Inspect → Console tab</p>
+            <button onclick="window.open('http://localhost:15178', '_blank')">Open Application</button>
+        </div>
+
+        <div class="test-step">
+            <h3>Step 2: Create Multiple Boards</h3>
+            <ul>
+                <li>Create "Board Alpha" with tickets: "Alpha Task 1", "Alpha Task 2"</li>
+                <li>Create "Board Beta" with tickets: "Beta Task 1", "Beta Task 2"</li>
+                <li>Create "Board Gamma" with tickets: "Gamma Task 1", "Gamma Task 2"</li>
+            </ul>
+        </div>
+
+        <div class="test-step">
+            <h3>Step 3: Navigate Between Boards</h3>
+            <p>Click on each board and watch the console for debug output</p>
+            <h4>Expected Console Output:</h4>
+            <div class="console-output">🔍 Board.tsx - boardId from URL params: abc123
+🔍 API Debug - Loading tickets for board: abc123
+🔍 API Call: GET /api/tickets/?board_id=abc123</div>
+        </div>
+
+        <div class="test-step">
+            <h3>Step 4: Verify Board Isolation</h3>
+            <p>Each board should show ONLY its own tickets</p>
+            <ul>
+                <li>Board Alpha: Should show ONLY Alpha tasks</li>
+                <li>Board Beta: Should show ONLY Beta tasks</li>
+                <li>Board Gamma: Should show ONLY Gamma tasks</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🔍 Debug Output Tracker</h2>
+        <p>Copy console output here for analysis:</p>
+        <textarea id="consoleOutput" style="width: 100%; height: 200px; font-family: monospace;"
+                  placeholder="Paste console output here..."></textarea>
+        <br>
+        <button onclick="analyzeOutput()">Analyze Debug Output</button>
+        <div id="analysisResult"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>📊 Test Results</h2>
+        <div id="testResults">
+            <div class="test-result pending">
+                <strong>PENDING:</strong> Board ID Detection - Waiting for test execution
+            </div>
+            <div class="test-result pending">
+                <strong>PENDING:</strong> API board_id Parameter - Waiting for test execution
+            </div>
+            <div class="test-result pending">
+                <strong>PENDING:</strong> Board Isolation - Waiting for test execution
+            </div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🚨 Quick Validation Checklist</h2>
+        <div id="quickChecks">
+            <label><input type="checkbox" id="check1"> boardId appears in console when navigating</label><br>
+            <label><input type="checkbox" id="check2"> Different boards show different boardId values</label><br>
+            <label><input type="checkbox" id="check3"> API calls include board_id parameter</label><br>
+            <label><input type="checkbox" id="check4"> Each board shows only its own tickets</label><br>
+            <label><input type="checkbox" id="check5"> No cross-board ticket contamination</label><br>
+        </div>
+        <br>
+        <button onclick="generateReport()">Generate Test Report</button>
+        <div id="finalReport"></div>
+    </div>
+
+    <script>
+        function analyzeOutput() {
+            const output = document.getElementById('consoleOutput').value;
+            const analysisDiv = document.getElementById('analysisResult');
+
+            let analysis = '<h3>🔍 Debug Output Analysis</h3>';
+
+            // Check for boardId detection
+            if (output.includes('boardId from URL params:')) {
+                analysis += '<div class="api-call">✅ Board ID Detection: Found boardId debug output</div>';
+            } else {
+                analysis += '<div class="api-call">❌ Board ID Detection: No boardId debug output found</div>';
+            }
+
+            // Check for API calls with board_id
+            if (output.includes('board_id=')) {
+                const boardIdMatches = output.match(/board_id=([^&\s]+)/g);
+                analysis += '<div class="api-call">✅ API board_id Parameter: Found ' + (boardIdMatches ? boardIdMatches.length : 0) + ' API calls with board_id</div>';
+                if (boardIdMatches) {
+                    analysis += '<div class="console-output">API Calls: ' + boardIdMatches.join(', ') + '</div>';
+                }
+            } else {
+                analysis += '<div class="api-call">❌ API board_id Parameter: No board_id parameters found in API calls</div>';
+            }
+
+            // Check for different board IDs
+            const boardIdValues = output.match(/boardId from URL params: ([^\s]+)/g);
+            if (boardIdValues && new Set(boardIdValues).size > 1) {
+                analysis += '<div class="api-call">✅ Multiple Board IDs: Found different board IDs</div>';
+            } else {
+                analysis += '<div class="api-call">⚠️ Multiple Board IDs: Only one or no board IDs detected</div>';
+            }
+
+            analysisDiv.innerHTML = analysis;
+        }
+
+        function generateReport() {
+            const checks = [
+                { id: 'check1', label: 'Board ID Detection' },
+                { id: 'check2', label: 'Different Board IDs' },
+                { id: 'check3', label: 'API board_id Parameter' },
+                { id: 'check4', label: 'Board Isolation' },
+                { id: 'check5', label: 'No Cross-Contamination' }
+            ];
+
+            let passCount = 0;
+            let report = '<h3>🔴 CRITICAL P0 Test Report</h3>';
+            report += '<p><strong>Timestamp:</strong> ' + new Date().toISOString() + '</p>';
+
+            checks.forEach(check => {
+                const checkbox = document.getElementById(check.id);
+                if (checkbox.checked) {
+                    passCount++;
+                    report += '<div class="test-result pass">✅ PASS: ' + check.label + '</div>';
+                } else {
+                    report += '<div class="test-result fail">❌ FAIL: ' + check.label + '</div>';
+                }
+            });
+
+            const overallStatus = passCount === checks.length ? 'PASS' : 'FAIL';
+            const statusClass = overallStatus === 'PASS' ? 'pass' : 'fail';
+
+            report += '<div class="test-result ' + statusClass + '">';
+            report += '<strong>OVERALL STATUS: ' + overallStatus + '</strong>';
+            report += '<br>Passed: ' + passCount + '/' + checks.length;
+            if (overallStatus === 'FAIL') {
+                report += '<br>🔴 CRITICAL: Board isolation data corruption still exists!';
+            } else {
+                report += '<br>✅ Board isolation working correctly!';
+            }
+            report += '</div>';
+
+            document.getElementById('finalReport').innerHTML = report;
+        }
+
+        // Auto-check if running in iframe or embedded
+        if (window.location !== window.parent.location) {
+            document.body.style.background = '#fff';
+        }
+    </script>
+</body>
+</html>

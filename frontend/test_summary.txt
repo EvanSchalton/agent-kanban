@@ -1,0 +1,74 @@
+FFFFFFFEEEEEEEEEEFFFFFFFFFFFFF.......F..........FFFFFFFFFFF...F.F.....FF [ 69%]
+FFF..F..FF.F...................F                                         [100%]
+=============================== warnings summary ===============================
+../../../usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: 12 warnings
+  /usr/local/lib/python3.11/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+../../../usr/local/lib/python3.11/site-packages/passlib/utils/__init__.py:854
+  /usr/local/lib/python3.11/site-packages/passlib/utils/__init__.py:854: DeprecationWarning: 'crypt' is deprecated and slated for removal in Python 3.13
+    from crypt import crypt as _crypt
+
+../../../usr/local/lib/python3.11/site-packages/pydantic/fields.py:1062
+../../../usr/local/lib/python3.11/site-packages/pydantic/fields.py:1062
+../../../usr/local/lib/python3.11/site-packages/pydantic/fields.py:1062
+  /usr/local/lib/python3.11/site-packages/pydantic/fields.py:1062: PydanticDeprecatedSince20: `min_items` is deprecated and will be removed, use `min_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warn('`min_items` is deprecated and will be removed, use `min_length` instead', DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED ../backend/tests/test_api_integration.py::TestBoardEndpoints::test_create_board
+FAILED ../backend/tests/test_api_integration.py::TestBoardEndpoints::test_create_board_with_custom_columns
+FAILED ../backend/tests/test_api_integration.py::TestBoardEndpoints::test_get_boards
+FAILED ../backend/tests/test_api_integration.py::TestBoardEndpoints::test_get_board
+FAILED ../backend/tests/test_api_integration.py::TestBoardEndpoints::test_update_board
+FAILED ../backend/tests/test_api_integration.py::TestBoardEndpoints::test_update_board_columns
+FAILED ../backend/tests/test_api_integration.py::TestBoardEndpoints::test_delete_board
+FAILED ../backend/tests/test_api_integration.py::TestWebSocketFunctionality::test_websocket_connection
+FAILED ../backend/tests/test_api_integration.py::TestWebSocketFunctionality::test_websocket_ticket_events
+FAILED ../backend/tests/test_api_integration.py::TestLoadPreparation::test_concurrent_ticket_creation
+FAILED ../backend/tests/test_api_integration.py::TestLoadPreparation::test_api_performance_baseline
+FAILED ../backend/tests/test_bulk_operations.py::TestBulkOperations::test_bulk_move_tickets
+FAILED ../backend/tests/test_bulk_operations.py::TestBulkOperations::test_bulk_move_tickets_empty_list
+FAILED ../backend/tests/test_bulk_operations.py::TestBulkOperations::test_bulk_move_tickets_invalid_tickets
+FAILED ../backend/tests/test_bulk_operations.py::TestBulkOperations::test_bulk_update_priority
+FAILED ../backend/tests/test_bulk_operations.py::TestBulkOperations::test_bulk_assign_tickets
+FAILED ../backend/tests/test_bulk_operations.py::TestBulkOperations::test_bulk_unassign_tickets
+FAILED ../backend/tests/test_bulk_operations.py::TestBulkOperations::test_bulk_operations_rate_limiting
+FAILED ../backend/tests/test_bulk_operations.py::TestBulkOperations::test_bulk_operations_status
+FAILED ../backend/tests/test_bulk_operations.py::TestBulkOperations::test_bulk_operation_performance
+FAILED ../backend/tests/test_drag_drop_logging.py::TestLogDragDropOperationDecorator::test_decorator_with_sync_function
+FAILED ../backend/tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_board_statistics_with_cache
+FAILED ../backend/tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_ticket_color_classifications
+FAILED ../backend/tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_realtime_ticket_colors
+FAILED ../backend/tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_realtime_ticket_colors_limits
+FAILED ../backend/tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_column_statistics
+FAILED ../backend/tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_column_statistics_not_found
+FAILED ../backend/tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_drag_drop_metrics
+FAILED ../backend/tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_all_drag_drop_metrics
+FAILED ../backend/tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_statistics_health
+FAILED ../backend/tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_clear_statistics_cache
+FAILED ../backend/tests/test_enhanced_statistics.py::TestEnhancedStatistics::test_performance_metrics
+FAILED ../backend/tests/test_error_handlers.py::TestErrorHandlers::test_general_exception_handler
+FAILED ../backend/tests/test_error_handlers.py::TestRequestLoggingMiddleware::test_error_request_logging
+FAILED ../backend/tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_ticket_history_success
+FAILED ../backend/tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_ticket_history_not_found
+FAILED ../backend/tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_ticket_history_with_field_filter
+FAILED ../backend/tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_ticket_transitions
+FAILED ../backend/tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_board_activity
+FAILED ../backend/tests/test_history_endpoints.py::TestHistoryEndpoints::test_get_history_statistics
+FAILED ../backend/tests/test_history_endpoints.py::TestHistoryEndpoints::test_history_endpoint_error_handling
+FAILED ../backend/tests/test_history_endpoints.py::TestHistoryEndpoints::test_history_pagination
+FAILED ../backend/tests/test_statistics_service.py::TestStatisticsService::test_calculate_ticket_statistics
+FAILED ../backend/tests/test_websocket_manager.py::TestConnectionManager::test_broadcast_to_board
+ERROR ../backend/tests/test_api_integration.py::TestTicketEndpoints::test_create_ticket
+ERROR ../backend/tests/test_api_integration.py::TestTicketEndpoints::test_get_tickets
+ERROR ../backend/tests/test_api_integration.py::TestTicketEndpoints::test_get_ticket
+ERROR ../backend/tests/test_api_integration.py::TestTicketEndpoints::test_update_ticket
+ERROR ../backend/tests/test_api_integration.py::TestTicketEndpoints::test_move_ticket
+ERROR ../backend/tests/test_api_integration.py::TestTicketEndpoints::test_claim_ticket
+ERROR ../backend/tests/test_api_integration.py::TestTicketEndpoints::test_delete_ticket
+ERROR ../backend/tests/test_api_integration.py::TestCommentEndpoints::test_create_comment
+ERROR ../backend/tests/test_api_integration.py::TestCommentEndpoints::test_get_comments
+ERROR ../backend/tests/test_api_integration.py::TestCommentEndpoints::test_delete_comment
+44 failed, 50 passed, 16 warnings, 10 errors in 7.41s

@@ -1,0 +1,41 @@
+{
+  "results": [
+    {
+      "test": "Setup Test Data",
+      "status": "PASS",
+      "timestamp": "2025-08-10T22:39:22.487844",
+      "details": "Using board ID: 1"
+    },
+    {
+      "test": "WebSocket Connection",
+      "status": "WARNING",
+      "timestamp": "2025-08-10T22:39:22.802924",
+      "details": "Connected but unexpected message: {'event': 'ticket_created', 'data': {'id': 91, 'board_id': 1, 'column': 'Not Started'}}"
+    },
+    {
+      "test": "Multiple Client Connections",
+      "status": "PASS",
+      "timestamp": "2025-08-10T22:39:23.549943",
+      "details": "Successfully connected 3 clients"
+    },
+    {
+      "test": "Connection Resilience",
+      "status": "WARNING",
+      "timestamp": "2025-08-10T22:40:23.864757",
+      "details": "Only 0/5 connections succeeded"
+    },
+    {
+      "test": "Real-time Broadcast",
+      "status": "PASS",
+      "timestamp": "2025-08-10T22:40:28.329965",
+      "details": "Broadcast working: 251 update messages"
+    },
+    {
+      "test": "WebSocket Latency",
+      "status": "PASS",
+      "timestamp": "2025-08-10T22:40:28.656393",
+      "details": "Excellent: 13.2ms avg, 39.3ms max"
+    }
+  ],
+  "timestamp": "2025-08-10T22:40:28.656639"
+}

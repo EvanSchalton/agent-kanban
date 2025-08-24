@@ -1,0 +1,19 @@
+{
+  "config": {
+    "agents": 20,
+    "total_tasks": 500,
+    "tasks_per_agent": 25
+  },
+  "metrics": {
+    "total_time": 18.401503086090088,
+    "successful_tasks": 500,
+    "failed_tasks": 0,
+    "success_rate": 100.0,
+    "throughput": 27.171693402478404,
+    "avg_response_time": 0.610827495098114,
+    "min_response_time": 0.03304004669189453,
+    "max_response_time": 1.9554834365844727
+  },
+  "failures": [],
+  "timestamp": "2025-08-15T05:05:22.232270"
+}

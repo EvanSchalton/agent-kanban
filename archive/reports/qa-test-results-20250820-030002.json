@@ -1,0 +1,83 @@
+{
+  "timestamp": "2025-08-20T03:00:02.527288",
+  "summary": {
+    "total": 12,
+    "passed": 11,
+    "failed": 1,
+    "success_rate": 91.66666666666666
+  },
+  "results": [
+    {
+      "test": "Backend Health Check",
+      "status": "PASS",
+      "timestamp": "2025-08-20T03:00:00.335486",
+      "details": "Status: healthy"
+    },
+    {
+      "test": "Boards API",
+      "status": "PASS",
+      "timestamp": "2025-08-20T03:00:00.343704",
+      "details": "Found 3 boards"
+    },
+    {
+      "test": "Tickets API",
+      "status": "PASS",
+      "timestamp": "2025-08-20T03:00:00.351483",
+      "details": "Found 22 tickets in board 1"
+    },
+    {
+      "test": "Create Ticket",
+      "status": "PASS",
+      "timestamp": "2025-08-20T03:00:00.438441",
+      "details": "Created ticket ID: 28"
+    },
+    {
+      "test": "Move Ticket API",
+      "status": "PASS",
+      "timestamp": "2025-08-20T03:00:00.466380",
+      "details": "Moved to In Progress"
+    },
+    {
+      "test": "Data Persistence Check",
+      "status": "PASS",
+      "timestamp": "2025-08-20T03:00:00.474166",
+      "details": "Title and description preserved"
+    },
+    {
+      "test": "Move Ticket API",
+      "status": "PASS",
+      "timestamp": "2025-08-20T03:00:00.490422",
+      "details": "Moved to In Progress"
+    },
+    {
+      "test": "Move Ticket API",
+      "status": "PASS",
+      "timestamp": "2025-08-20T03:00:00.999249",
+      "details": "Moved to Blocked"
+    },
+    {
+      "test": "Move Ticket API",
+      "status": "PASS",
+      "timestamp": "2025-08-20T03:00:01.509415",
+      "details": "Moved to Ready for QC"
+    },
+    {
+      "test": "Move Ticket API",
+      "status": "PASS",
+      "timestamp": "2025-08-20T03:00:02.019575",
+      "details": "Moved to Done"
+    },
+    {
+      "test": "Drag Drop Sequence",
+      "status": "PASS",
+      "timestamp": "2025-08-20T03:00:02.520840",
+      "details": "All column transitions successful"
+    },
+    {
+      "test": "Invalid Column Handling",
+      "status": "FAIL",
+      "timestamp": "2025-08-20T03:00:02.527047",
+      "details": "Unexpected response: 200"
+    }
+  ]
+}

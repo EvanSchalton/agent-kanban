@@ -1,0 +1,90 @@
+{
+  "config": {
+    "agents": 20,
+    "total_tasks": 500,
+    "tasks_per_agent": 25
+  },
+  "metrics": {
+    "total_time": 45.427820920944214,
+    "successful_tasks": 440,
+    "failed_tasks": 60,
+    "success_rate": 88.0,
+    "throughput": 9.685694604760158,
+    "avg_response_time": 0.5606071396307512,
+    "min_response_time": 0.032196998596191406,
+    "max_response_time": 2.293843984603882
+  },
+  "failures": [
+    {
+      "success": false,
+      "time": 10.012273788452148,
+      "agent": 1,
+      "task": 4,
+      "error": "HTTPConnectionPool(host='localhost', port=18000): Read timed out. (read timeout=10)"
+    },
+    {
+      "success": false,
+      "time": 10.02837872505188,
+      "agent": 1,
+      "task": 5,
+      "error": "HTTPConnectionPool(host='localhost', port=18000): Read timed out. (read timeout=10)"
+    },
+    {
+      "success": false,
+      "time": 10.032299518585205,
+      "agent": 1,
+      "task": 6,
+      "error": "HTTPConnectionPool(host='localhost', port=18000): Read timed out. (read timeout=10)"
+    },
+    {
+      "success": false,
+      "time": 10.028630018234253,
+      "agent": 2,
+      "task": 3,
+      "error": "HTTPConnectionPool(host='localhost', port=18000): Read timed out. (read timeout=10)"
+    },
+    {
+      "success": false,
+      "time": 10.012304067611694,
+      "agent": 2,
+      "task": 4,
+      "error": "HTTPConnectionPool(host='localhost', port=18000): Read timed out. (read timeout=10)"
+    },
+    {
+      "success": false,
+      "time": 10.018040657043457,
+      "agent": 2,
+      "task": 5,
+      "error": "HTTPConnectionPool(host='localhost', port=18000): Read timed out. (read timeout=10)"
+    },
+    {
+      "success": false,
+      "time": 10.016374111175537,
+      "agent": 3,
+      "task": 3,
+      "error": "HTTPConnectionPool(host='localhost', port=18000): Read timed out. (read timeout=10)"
+    },
+    {
+      "success": false,
+      "time": 10.004334688186646,
+      "agent": 3,
+      "task": 4,
+      "error": "HTTPConnectionPool(host='localhost', port=18000): Read timed out. (read timeout=10)"
+    },
+    {
+      "success": false,
+      "time": 10.00370454788208,
+      "agent": 3,
+      "task": 5,
+      "error": "HTTPConnectionPool(host='localhost', port=18000): Read timed out. (read timeout=10)"
+    },
+    {
+      "success": false,
+      "time": 10.022505044937134,
+      "agent": 4,
+      "task": 3,
+      "error": "HTTPConnectionPool(host='localhost', port=18000): Read timed out. (read timeout=10)"
+    }
+  ],
+  "timestamp": "2025-08-15T05:04:58.243609"
+}

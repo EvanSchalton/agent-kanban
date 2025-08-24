@@ -1,0 +1,141 @@
+{
+  "results": {
+    "test_results": [
+      {
+        "category": "API",
+        "test": "Health Check",
+        "status": "PASS",
+        "timestamp": "2025-08-10T22:55:58.168652",
+        "details": "API responsive"
+      },
+      {
+        "category": "API",
+        "test": "List Boards",
+        "status": "PASS",
+        "timestamp": "2025-08-10T22:55:58.174995",
+        "details": "Found 18 boards"
+      },
+      {
+        "category": "API",
+        "test": "List Tickets",
+        "status": "PASS",
+        "timestamp": "2025-08-10T22:55:58.208195",
+        "details": "Found 563 tickets"
+      },
+      {
+        "category": "Drag-Drop",
+        "test": "Drag-Drop Testing",
+        "status": "FAIL",
+        "timestamp": "2025-08-10T22:55:58.215182",
+        "details": "Exception: 'str' object has no attribute 'get'"
+      },
+      {
+        "category": "Statistical",
+        "test": "Required Fields",
+        "status": "PASS",
+        "timestamp": "2025-08-10T22:55:58.252710",
+        "details": "100% tickets have required fields"
+      },
+      {
+        "category": "Statistical",
+        "test": "Priority Distribution",
+        "status": "PASS",
+        "timestamp": "2025-08-10T22:55:58.253012",
+        "details": "Priorities: {'1.0': 29, '2.0': 9, '3.0': 5, '0.0': 4, '4.0': 4, 'high': 1, '1.0.1.0.0.1': 1, 'High': 132, 'Medium': 125, 'Low': 140, 'Critical': 113}"
+      },
+      {
+        "category": "Statistical",
+        "test": "Time Calculations",
+        "status": "PASS",
+        "timestamp": "2025-08-10T22:55:58.254669",
+        "details": "100% tickets have valid timestamps"
+      },
+      {
+        "category": "SearchFilter",
+        "test": "Assignee Filter Data",
+        "status": "PASS",
+        "timestamp": "2025-08-10T22:55:58.287682",
+        "details": "Assignees: ['test_agent_01', 'agent1', 'test_agent', 'agent2', 'CLI Test'], Unassigned: 555"
+      },
+      {
+        "category": "SearchFilter",
+        "test": "Priority Filter Data",
+        "status": "PASS",
+        "timestamp": "2025-08-10T22:55:58.288021",
+        "details": "Priority distribution: {'1.0': 29, '2.0': 9, '3.0': 5, '0.0': 4, '4.0': 4, 'high': 1, '1.0.1.0.0.1': 1, 'High': 132, 'Medium': 125, 'Low': 140, 'Critical': 113}"
+      },
+      {
+        "category": "SearchFilter",
+        "test": "Search Filter Testing",
+        "status": "FAIL",
+        "timestamp": "2025-08-10T22:55:58.288084",
+        "details": "Exception: 'NoneType' object has no attribute 'lower'"
+      },
+      {
+        "category": "Performance",
+        "test": "Large Query",
+        "status": "PASS",
+        "timestamp": "2025-08-10T22:55:58.320039",
+        "details": "563 tickets in 30ms"
+      },
+      {
+        "category": "Performance",
+        "test": "Quick Operations",
+        "status": "PASS",
+        "timestamp": "2025-08-10T22:55:58.361365",
+        "details": "5 ops, 8ms avg"
+      },
+      {
+        "category": "Edge Cases",
+        "test": "Invalid Ticket ID",
+        "status": "PASS",
+        "timestamp": "2025-08-10T22:55:58.373527",
+        "details": "Properly handles 404"
+      },
+      {
+        "category": "Edge Cases",
+        "test": "Invalid Move",
+        "status": "WARNING",
+        "timestamp": "2025-08-10T22:55:58.381110",
+        "details": "Unexpected status: 405"
+      },
+      {
+        "category": "Edge Cases",
+        "test": "Empty Search",
+        "status": "PASS",
+        "timestamp": "2025-08-10T22:55:58.433454",
+        "details": "Handles empty search"
+      },
+      {
+        "category": "Accessibility",
+        "test": "TicketCard A11y",
+        "status": "PASS",
+        "timestamp": "2025-08-10T22:55:58.433738",
+        "details": "TicketCard implements 8 accessibility features"
+      },
+      {
+        "category": "Accessibility",
+        "test": "Performance Optimizations",
+        "status": "PASS",
+        "timestamp": "2025-08-10T22:55:58.433753",
+        "details": "Components have 4 performance optimizations"
+      }
+    ],
+    "bugs_found": [
+      {
+        "category": "Drag-Drop",
+        "test": "Drag-Drop Testing",
+        "severity": "HIGH",
+        "details": "Exception: 'str' object has no attribute 'get'"
+      },
+      {
+        "category": "SearchFilter",
+        "test": "Search Filter Testing",
+        "severity": "MEDIUM",
+        "details": "Exception: 'NoneType' object has no attribute 'lower'"
+      }
+    ],
+    "ticket_count": 563
+  },
+  "timestamp": "2025-08-10T22:55:58.434070"
+}

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Real-time Sync Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .connected { background-color: #d4edda; color: #155724; }
+        .disconnected { background-color: #f8d7da; color: #721c24; }
+        .message { padding: 5px; margin: 5px 0; background-color: #f8f9fa; border-left: 3px solid #007bff; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        .log { height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Real-time Sync Test</h1>
+
+    <div id="status" class="status disconnected">Disconnected</div>
+
+    <div>
+        <button onclick="connectWebSocket()">Connect WebSocket</button>
+        <button onclick="disconnectWebSocket()">Disconnect</button>
+        <button onclick="testCardCreation()">Test Card Creation + Sync</button>
+        <button onclick="testTicketMove()">Test Ticket Move + Sync</button>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <h3>Event Log:</h3>
+    <div id="log" class="log"></div>
+
+    <script>
+        let ws = null;
+        let isConnected = false;
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'message';
+            logEntry.innerHTML = `<strong>[${time}]</strong> ${message}`;
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(`[${time}] ${message}`);
+        }
+
+        function updateStatus(connected) {
+            const statusDiv = document.getElementById('status');
+            isConnected = connected;
+            if (connected) {
+                statusDiv.textContent = 'Connected to WebSocket';
+                statusDiv.className = 'status connected';
+            } else {
+                statusDiv.textContent = 'Disconnected from WebSocket';
+                statusDiv.className = 'status disconnected';
+            }
+        }
+
+        function connectWebSocket() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                log('WebSocket already connected');
+                return;
+            }
+
+            const username = 'test_user_' + Math.floor(Math.random() * 1000);
+            const wsUrl = `ws://localhost:18000/ws/connect?username=${username}&board_id=1`;
+
+            log(`Connecting to: ${wsUrl}`);
+
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = function(event) {
+                log('✅ WebSocket Connected!');
+                updateStatus(true);
+            };
+
+            ws.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    log(`📡 WebSocket Message: ${data.event || data.type} - ${JSON.stringify(data.data || data)}`);
+
+                    // Handle different message types
+                    if (data.event === 'connected') {
+                        log(`🎉 Connection confirmed for user: ${data.data.username}`);
+                    } else if (data.event === 'ticket_created') {
+                        log(`🎫 REAL-TIME: New ticket created - ${data.data.title}`);
+                    } else if (data.event === 'ticket_moved') {
+                        log(`↗️ REAL-TIME: Ticket moved - ID: ${data.data.id}, Column: ${data.data.current_column}`);
+                    } else if (data.event === 'heartbeat') {
+                        log(`💓 Heartbeat received`);
+                        // Respond to heartbeat
+                        ws.send(JSON.stringify({
+                            type: 'heartbeat_response',
+                            heartbeat_id: data.heartbeat_id,
+                            timestamp: new Date().toISOString()
+                        }));
+                    }
+                } catch (error) {
+                    log(`❌ Failed to parse WebSocket message: ${error.message}`);
+                }
+            };
+
+            ws.onclose = function(event) {
+                log(`🔌 WebSocket Closed: Code ${event.code}, Reason: ${event.reason}`);
+                updateStatus(false);
+            };
+
+            ws.onerror = function(error) {
+                log(`❌ WebSocket Error: ${error}`);
+                updateStatus(false);
+            };
+        }
+
+        function disconnectWebSocket() {
+            if (ws) {
+                ws.close();
+                ws = null;
+                log('WebSocket disconnected manually');
+                updateStatus(false);
+            }
+        }
+
+        async function testCardCreation() {
+            log('🧪 Testing Card Creation + Real-time Sync...');
+
+            try {
+                const response = await fetch('/api/tickets/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: 'Real-time Test Card ' + Math.floor(Math.random() * 1000),
+                        description: 'Testing WebSocket real-time synchronization',
+                        board_id: 1,
+                        current_column: 'Not Started'
+                    })
+                });
+
+                if (response.ok) {
+                    const ticket = await response.json();
+                    log(`✅ Card created via API: ID ${ticket.id}, Title: "${ticket.title}"`);
+                    log('🕐 Waiting for WebSocket broadcast...');
+                } else {
+                    const error = await response.text();
+                    log(`❌ Card creation failed: ${response.status} - ${error}`);
+                }
+            } catch (error) {
+                log(`❌ Network error during card creation: ${error.message}`);
+            }
+        }
+
+        async function testTicketMove() {
+            log('🧪 Testing Ticket Move + Real-time Sync...');
+
+            try {
+                // First get a ticket to move
+                const ticketsResponse = await fetch('/api/boards/1/tickets');
+                const ticketsData = await ticketsResponse.json();
+                const tickets = ticketsData.tickets || [];
+
+                if (tickets.length === 0) {
+                    log('❌ No tickets found to move. Create a ticket first.');
+                    return;
+                }
+
+                const ticket = tickets[0];
+                log(`📋 Moving ticket: ID ${ticket.id}, Current: "${ticket.current_column}"`);
+
+                const response = await fetch(`/api/tickets/${ticket.id}/move`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        column: 'In Progress'
+                    })
+                });
+
+                if (response.ok) {
+                    const movedTicket = await response.json();
+                    log(`✅ Ticket moved via API: ID ${movedTicket.id} → "${movedTicket.current_column}"`);
+                    log('🕐 Waiting for WebSocket broadcast...');
+                } else {
+                    const error = await response.text();
+                    log(`❌ Ticket move failed: ${response.status} - ${error}`);
+                }
+            } catch (error) {
+                log(`❌ Network error during ticket move: ${error.message}`);
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        // Auto-connect on page load
+        window.onload = function() {
+            log('🚀 WebSocket Real-time Sync Test Ready');
+            log('Click "Connect WebSocket" to start testing');
+        };
+    </script>
+</body>
+</html>

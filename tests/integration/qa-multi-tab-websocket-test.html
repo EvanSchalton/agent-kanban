@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Multi-Tab WebSocket Integration Test</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .test-panel { background: white; border: 2px solid #ddd; margin: 10px 0; padding: 20px; border-radius: 8px; }
+        .test-panel.active { border-color: #4CAF50; }
+        .test-panel.error { border-color: #f44336; }
+        .status { font-weight: bold; padding: 5px 10px; border-radius: 4px; }
+        .status.success { background: #4CAF50; color: white; }
+        .status.error { background: #f44336; color: white; }
+        .status.info { background: #2196F3; color: white; }
+        .status.warning { background: #FF9800; color: white; }
+        #log { height: 300px; overflow-y: scroll; border: 1px solid #333; padding: 10px; background: #f9f9f9; font-family: monospace; }
+        button { margin: 5px; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-primary { background: #2196F3; color: white; }
+        .btn-success { background: #4CAF50; color: white; }
+        .btn-warning { background: #FF9800; color: white; }
+        .btn-danger { background: #f44336; color: white; }
+        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 20px 0; }
+        .metric { background: #e3f2fd; padding: 15px; border-radius: 4px; text-align: center; }
+        .metric h4 { margin: 0 0 10px 0; color: #1976d2; }
+        .metric .value { font-size: 24px; font-weight: bold; color: #0d47a1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 QA Multi-Tab WebSocket Integration Test</h1>
+        <div class="status info" id="tab-identifier">Tab ID: Loading...</div>
+
+        <div class="metrics">
+            <div class="metric">
+                <h4>WebSocket Status</h4>
+                <div class="value" id="ws-status">Disconnected</div>
+            </div>
+            <div class="metric">
+                <h4>Events Received</h4>
+                <div class="value" id="events-count">0</div>
+            </div>
+            <div class="metric">
+                <h4>Messages Sent</h4>
+                <div class="value" id="messages-sent">0</div>
+            </div>
+            <div class="metric">
+                <h4>Board</h4>
+                <div class="value" id="current-board">1</div>
+            </div>
+        </div>
+
+        <div class="test-panel">
+            <h3>🔌 Connection Management</h3>
+            <button class="btn-primary" onclick="connectWebSocket()">Connect to Board 1</button>
+            <button class="btn-warning" onclick="switchBoard(2)">Switch to Board 2</button>
+            <button class="btn-warning" onclick="switchBoard(3)">Switch to Board 3</button>
+            <button class="btn-danger" onclick="disconnectWebSocket()">Disconnect</button>
+        </div>
+
+        <div class="test-panel">
+            <h3>🎯 Real-time Sync Tests</h3>
+            <button class="btn-success" onclick="createTestCard()">Create Test Card</button>
+            <button class="btn-success" onclick="updateTestCard()">Update Last Card</button>
+            <button class="btn-warning" onclick="moveTestCard()">Move Last Card</button>
+            <button class="btn-primary" onclick="startAutoTest()">Start Auto-Test (10s intervals)</button>
+            <button class="btn-danger" onclick="stopAutoTest()">Stop Auto-Test</button>
+        </div>
+
+        <div class="test-panel">
+            <h3>📊 Event Monitor</h3>
+            <button class="btn-primary" onclick="clearLog()">Clear Log</button>
+            <button class="btn-success" onclick="exportResults()">Export Results</button>
+            <div id="log"></div>
+        </div>
+
+        <div class="test-panel">
+            <h3>🔍 Integration Test Results</h3>
+            <div id="test-results">
+                <p>Open multiple tabs of this page to test real-time synchronization.</p>
+                <p>Each tab will have a unique ID and should receive events from other tabs.</p>
+                <p><strong>Expected behavior:</strong> When you create/update cards in one tab, all other tabs should immediately see the changes.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let socket = null;
+        let tabId = 'tab_' + Math.random().toString(36).substr(2, 9);
+        let currentBoard = 1;
+        let eventsReceived = 0;
+        let messagesSent = 0;
+        let lastCreatedCardId = null;
+        let autoTestInterval = null;
+        let testResults = {
+            webSocketConnection: false,
+            realTimeSync: false,
+            boardIsolation: false,
+            userAttribution: false,
+            dataConsistency: false
+        };
+
+        // Initialize tab
+        document.getElementById('tab-identifier').textContent = `Tab ID: ${tabId}`;
+        document.getElementById('current-board').textContent = currentBoard;
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.style.color = type === 'error' ? '#f44336' : type === 'success' ? '#4CAF50' : '#333';
+            entry.innerHTML = `[${timestamp}] [${tabId}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(`[QA-INTEGRATION] [${tabId}] ${message}`);
+        }
+
+        function updateMetric(id, value) {
+            document.getElementById(id).textContent = value;
+        }
+
+        function connectWebSocket() {
+            if (socket && socket.connected) {
+                log('Already connected to WebSocket', 'warning');
+                return;
+            }
+
+            log('🔌 Connecting to WebSocket...', 'info');
+            updateMetric('ws-status', 'Connecting...');
+
+            socket = io('http://localhost:8000', {
+                transports: ['websocket', 'polling'],
+                timeout: 5000,
+                query: { tabId: tabId }
+            });
+
+            socket.on('connect', () => {
+                testResults.webSocketConnection = true;
+                updateMetric('ws-status', 'Connected');
+                log('✅ WebSocket connected successfully', 'success');
+
+                // Join current board room
+                socket.emit('join_board', {
+                    board_id: currentBoard,
+                    username: `QA-Tester-${tabId}`
+                });
+                log(`📡 Joined board ${currentBoard} room`, 'info');
+            });
+
+            socket.on('disconnect', (reason) => {
+                testResults.webSocketConnection = false;
+                updateMetric('ws-status', 'Disconnected');
+                log(`❌ WebSocket disconnected: ${reason}`, 'error');
+            });
+
+            socket.on('connect_error', (error) => {
+                testResults.webSocketConnection = false;
+                updateMetric('ws-status', 'Error');
+                log(`❌ Connection error: ${error.message}`, 'error');
+            });
+
+            // Real-time event listeners
+            socket.on('ticket_created', (data) => {
+                eventsReceived++;
+                updateMetric('events-count', eventsReceived);
+                testResults.realTimeSync = true;
+                log(`📨 Received ticket_created: ${JSON.stringify(data)}`, 'success');
+
+                // Test user attribution
+                if (data.created_by || data.assignee) {
+                    testResults.userAttribution = true;
+                    log(`👤 User attribution detected: ${data.created_by || data.assignee}`, 'success');
+                }
+            });
+
+            socket.on('ticket_updated', (data) => {
+                eventsReceived++;
+                updateMetric('events-count', eventsReceived);
+                testResults.realTimeSync = true;
+                log(`📨 Received ticket_updated: ${JSON.stringify(data)}`, 'success');
+            });
+
+            socket.on('ticket_moved', (data) => {
+                eventsReceived++;
+                updateMetric('events-count', eventsReceived);
+                testResults.realTimeSync = true;
+                log(`📨 Received ticket_moved: ${JSON.stringify(data)}`, 'success');
+            });
+
+            socket.on('board_updated', (data) => {
+                eventsReceived++;
+                updateMetric('events-count', eventsReceived);
+                log(`📨 Received board_updated: ${JSON.stringify(data)}`, 'info');
+            });
+        }
+
+        function disconnectWebSocket() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+                updateMetric('ws-status', 'Disconnected');
+                log('🔌 WebSocket disconnected manually', 'info');
+            }
+        }
+
+        function switchBoard(boardId) {
+            currentBoard = boardId;
+            updateMetric('current-board', currentBoard);
+
+            if (socket && socket.connected) {
+                socket.emit('leave_board', { board_id: currentBoard });
+                socket.emit('join_board', {
+                    board_id: currentBoard,
+                    username: `QA-Tester-${tabId}`
+                });
+                log(`🔄 Switched to board ${currentBoard}`, 'info');
+            } else {
+                log('⚠️ Connect WebSocket first to join board room', 'warning');
+            }
+        }
+
+        async function createTestCard() {
+            if (!socket || !socket.connected) {
+                log('❌ WebSocket not connected. Connect first.', 'error');
+                return;
+            }
+
+            const cardData = {
+                title: `Integration Test Card ${Date.now()} (${tabId})`,
+                description: `Created by ${tabId} for real-time sync testing`,
+                current_column: 'Not Started',
+                priority: 'high',
+                board_id: currentBoard,
+                created_by: `QA-Tester-${tabId}`
+            };
+
+            try {
+                log('🎯 Creating test card...', 'info');
+                const response = await fetch('/api/tickets/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(cardData)
+                });
+
+                if (response.ok) {
+                    const card = await response.json();
+                    lastCreatedCardId = card.id;
+                    messagesSent++;
+                    updateMetric('messages-sent', messagesSent);
+                    log(`✅ Card created: ID ${card.id} - ${card.title}`, 'success');
+
+                    // Test data persistence
+                    setTimeout(() => testDataPersistence(card.id), 1000);
+                } else {
+                    const error = await response.text();
+                    log(`❌ Card creation failed: ${error}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Card creation error: ${error.message}`, 'error');
+            }
+        }
+
+        async function updateTestCard() {
+            if (!lastCreatedCardId) {
+                log('❌ No card to update. Create a card first.', 'error');
+                return;
+            }
+
+            const updateData = {
+                description: `Updated by ${tabId} at ${new Date().toLocaleTimeString()}`,
+                priority: 'critical'
+            };
+
+            try {
+                const response = await fetch(`/api/tickets/${lastCreatedCardId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updateData)
+                });
+
+                if (response.ok) {
+                    messagesSent++;
+                    updateMetric('messages-sent', messagesSent);
+                    log(`✅ Card updated: ID ${lastCreatedCardId}`, 'success');
+                } else {
+                    log(`❌ Card update failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Card update error: ${error.message}`, 'error');
+            }
+        }
+
+        async function moveTestCard() {
+            if (!lastCreatedCardId) {
+                log('❌ No card to move. Create a card first.', 'error');
+                return;
+            }
+
+            const moveData = {
+                current_column: 'In Progress'
+            };
+
+            try {
+                const response = await fetch(`/api/tickets/${lastCreatedCardId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(moveData)
+                });
+
+                if (response.ok) {
+                    messagesSent++;
+                    updateMetric('messages-sent', messagesSent);
+                    log(`✅ Card moved: ID ${lastCreatedCardId} → In Progress`, 'success');
+                } else {
+                    log(`❌ Card move failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Card move error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDataPersistence(cardId) {
+            try {
+                const response = await fetch(`/api/tickets/${cardId}`);
+                if (response.ok) {
+                    const card = await response.json();
+                    testResults.dataConsistency = true;
+                    log(`✅ Data persistence verified: Card ${cardId} exists`, 'success');
+                } else {
+                    log(`❌ Data persistence failed: Card ${cardId} not found`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Data persistence test error: ${error.message}`, 'error');
+            }
+        }
+
+        function startAutoTest() {
+            if (autoTestInterval) {
+                log('⚠️ Auto-test already running', 'warning');
+                return;
+            }
+
+            log('🚀 Starting auto-test (10-second intervals)', 'info');
+            autoTestInterval = setInterval(() => {
+                if (socket && socket.connected) {
+                    createTestCard();
+                } else {
+                    log('⚠️ Auto-test paused: WebSocket not connected', 'warning');
+                }
+            }, 10000);
+        }
+
+        function stopAutoTest() {
+            if (autoTestInterval) {
+                clearInterval(autoTestInterval);
+                autoTestInterval = null;
+                log('🛑 Auto-test stopped', 'info');
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+            eventsReceived = 0;
+            messagesSent = 0;
+            updateMetric('events-count', 0);
+            updateMetric('messages-sent', 0);
+        }
+
+        function exportResults() {
+            const results = {
+                tabId: tabId,
+                timestamp: new Date().toISOString(),
+                testResults: testResults,
+                metrics: {
+                    eventsReceived: eventsReceived,
+                    messagesSent: messagesSent,
+                    currentBoard: currentBoard,
+                    webSocketConnected: socket && socket.connected
+                },
+                logs: document.getElementById('log').innerText
+            };
+
+            const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `qa-integration-test-${tabId}-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Auto-connect on page load
+        window.addEventListener('load', () => {
+            log('🚀 QA Integration Test Dashboard loaded', 'info');
+            log('📋 Instructions: Open multiple tabs to test real-time sync', 'info');
+            setTimeout(connectWebSocket, 1000);
+        });
+
+        // Update test results display
+        setInterval(() => {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = `
+                <h4>🔍 Test Results Summary</h4>
+                <p><strong>WebSocket Connection:</strong> <span style="color: ${testResults.webSocketConnection ? '#4CAF50' : '#f44336'}">${testResults.webSocketConnection ? 'PASS' : 'FAIL'}</span></p>
+                <p><strong>Real-time Sync:</strong> <span style="color: ${testResults.realTimeSync ? '#4CAF50' : '#f44336'}">${testResults.realTimeSync ? 'PASS' : 'FAIL'}</span></p>
+                <p><strong>Data Consistency:</strong> <span style="color: ${testResults.dataConsistency ? '#4CAF50' : '#f44336'}">${testResults.dataConsistency ? 'PASS' : 'FAIL'}</span></p>
+                <p><strong>User Attribution:</strong> <span style="color: ${testResults.userAttribution ? '#4CAF50' : '#f44336'}">${testResults.userAttribution ? 'PASS' : 'FAIL'}</span></p>
+                <p><strong>Events Received:</strong> ${eventsReceived}</p>
+                <p><strong>Messages Sent:</strong> ${messagesSent}</p>
+            `;
+        }, 2000);
+    </script>
+</body>
+</html>

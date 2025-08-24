@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Multi-Window Sync Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .connected { background: #d4edda; color: #155724; }
+        .disconnected { background: #f8d7da; color: #721c24; }
+        .message { background: #fff3cd; color: #856404; padding: 5px; margin: 2px 0; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        .test-section { border: 1px solid #ddd; padding: 15px; margin: 10px 0; }
+        #messages { height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🔄 WebSocket Multi-Window Sync Test</h1>
+
+    <div class="test-section">
+        <h3>Connection Status</h3>
+        <div id="status" class="status disconnected">Disconnected</div>
+        <button onclick="connect()">Connect</button>
+        <button onclick="disconnect()">Disconnect</button>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Actions</h3>
+        <p><strong>Instructions:</strong> Open this page in multiple windows/tabs, then test these actions:</p>
+        <button onclick="createTestTicket()">Create Test Ticket</button>
+        <button onclick="updateTestTicket()">Update Test Ticket</button>
+        <button onclick="moveTestTicket()">Move Test Ticket</button>
+        <button onclick="deleteTestTicket()">Delete Test Ticket</button>
+        <button onclick="claimTestTicket()">Claim Test Ticket</button>
+    </div>
+
+    <div class="test-section">
+        <h3>Real-time Messages</h3>
+        <div id="messages"></div>
+        <button onclick="clearMessages()">Clear Messages</button>
+    </div>
+
+    <script>
+        let ws = null;
+        let testTicketId = null;
+
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${wsProtocol}//${window.location.host}/ws/connect`;
+
+        function updateStatus(connected, message = '') {
+            const statusEl = document.getElementById('status');
+            if (connected) {
+                statusEl.className = 'status connected';
+                statusEl.textContent = `Connected${message ? ': ' + message : ''}`;
+            } else {
+                statusEl.className = 'status disconnected';
+                statusEl.textContent = `Disconnected${message ? ': ' + message : ''}`;
+            }
+        }
+
+        function addMessage(type, data) {
+            const messagesEl = document.getElementById('messages');
+            const messageEl = document.createElement('div');
+            messageEl.className = 'message';
+            messageEl.innerHTML = `
+                <strong>${new Date().toLocaleTimeString()}</strong> -
+                <strong>${type}</strong>: ${JSON.stringify(data, null, 2)}
+            `;
+            messagesEl.appendChild(messageEl);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        function connect() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                addMessage('INFO', 'Already connected');
+                return;
+            }
+
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                updateStatus(true, 'WebSocket connected');
+                addMessage('CONNECTED', 'WebSocket connection established');
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const message = JSON.parse(event.data);
+                    addMessage('RECEIVED', message);
+
+                    // Handle specific event types
+                    if (message.event) {
+                        switch (message.event) {
+                            case 'ticket_created':
+                                addMessage('SYNC EVENT', `✅ Ticket created: ${message.data.title || message.data.id}`);
+                                break;
+                            case 'ticket_updated':
+                                addMessage('SYNC EVENT', `🔄 Ticket updated: ${message.data.id}`);
+                                break;
+                            case 'ticket_moved':
+                                addMessage('SYNC EVENT', `🚀 Ticket moved: ${message.data.id} to ${message.data.to_column || message.data.current_column}`);
+                                break;
+                            case 'ticket_deleted':
+                                addMessage('SYNC EVENT', `❌ Ticket deleted: ${message.data.id}`);
+                                break;
+                            case 'ticket_claimed':
+                                addMessage('SYNC EVENT', `🎯 Ticket claimed: ${message.data.id} by ${message.data.assignee}`);
+                                break;
+                            case 'board_updated':
+                                addMessage('SYNC EVENT', `📊 Board updated: ${message.data.id}`);
+                                break;
+                        }
+                    }
+                } catch (e) {
+                    addMessage('ERROR', `Failed to parse message: ${e.message}`);
+                }
+            };
+
+            ws.onclose = () => {
+                updateStatus(false, 'Connection closed');
+                addMessage('DISCONNECTED', 'WebSocket connection closed');
+            };
+
+            ws.onerror = (error) => {
+                updateStatus(false, 'Connection error');
+                addMessage('ERROR', `WebSocket error: ${error}`);
+            };
+        }
+
+        function disconnect() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+        }
+
+        function clearMessages() {
+            document.getElementById('messages').innerHTML = '';
+        }
+
+        // API helper functions
+        async function apiRequest(method, url, data = null) {
+            const options = {
+                method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            try {
+                const response = await fetch(url, options);
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.detail || 'API request failed');
+                }
+                return result;
+            } catch (error) {
+                addMessage('API ERROR', error.message);
+                throw error;
+            }
+        }
+
+        async function createTestTicket() {
+            try {
+                const ticket = await apiRequest('POST', '/api/tickets/', {
+                    title: `Test Ticket ${Date.now()}`,
+                    description: 'Created for multi-window sync testing',
+                    priority: 'medium',
+                    current_column: 'todo',
+                    board_id: 1,
+                    created_by: 'test-user'
+                });
+                testTicketId = ticket.id;
+                addMessage('API SUCCESS', `Created ticket: ${ticket.id}`);
+            } catch (error) {
+                addMessage('API ERROR', `Failed to create ticket: ${error.message}`);
+            }
+        }
+
+        async function updateTestTicket() {
+            if (!testTicketId) {
+                addMessage('ERROR', 'No test ticket ID. Create a ticket first.');
+                return;
+            }
+
+            try {
+                await apiRequest('PUT', `/api/tickets/${testTicketId}`, {
+                    title: `Updated Test Ticket ${Date.now()}`,
+                    description: 'Updated for multi-window sync testing',
+                    priority: 'high',
+                    changed_by: 'test-user'
+                });
+                addMessage('API SUCCESS', `Updated ticket: ${testTicketId}`);
+            } catch (error) {
+                addMessage('API ERROR', `Failed to update ticket: ${error.message}`);
+            }
+        }
+
+        async function moveTestTicket() {
+            if (!testTicketId) {
+                addMessage('ERROR', 'No test ticket ID. Create a ticket first.');
+                return;
+            }
+
+            try {
+                await apiRequest('POST', `/api/tickets/${testTicketId}/move`, {
+                    column: 'in_progress',
+                    moved_by: 'test-user'
+                });
+                addMessage('API SUCCESS', `Moved ticket: ${testTicketId}`);
+            } catch (error) {
+                addMessage('API ERROR', `Failed to move ticket: ${error.message}`);
+            }
+        }
+
+        async function claimTestTicket() {
+            if (!testTicketId) {
+                addMessage('ERROR', 'No test ticket ID. Create a ticket first.');
+                return;
+            }
+
+            try {
+                await apiRequest('POST', `/api/tickets/${testTicketId}/claim?agent_id=test-agent`);
+                addMessage('API SUCCESS', `Claimed ticket: ${testTicketId}`);
+            } catch (error) {
+                addMessage('API ERROR', `Failed to claim ticket: ${error.message}`);
+            }
+        }
+
+        async function deleteTestTicket() {
+            if (!testTicketId) {
+                addMessage('ERROR', 'No test ticket ID. Create a ticket first.');
+                return;
+            }
+
+            try {
+                await apiRequest('DELETE', `/api/tickets/${testTicketId}`);
+                addMessage('API SUCCESS', `Deleted ticket: ${testTicketId}`);
+                testTicketId = null;
+            } catch (error) {
+                addMessage('API ERROR', `Failed to delete ticket: ${error.message}`);
+            }
+        }
+
+        // Auto-connect on load
+        window.onload = () => {
+            connect();
+            addMessage('INFO', 'Page loaded. Testing multi-window sync...');
+            addMessage('INSTRUCTIONS', 'Open this page in multiple tabs/windows and test the actions above');
+        };
+
+        window.onbeforeunload = () => {
+            disconnect();
+        };
+    </script>
+</body>
+</html>

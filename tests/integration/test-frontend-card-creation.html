@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Card Creation Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { margin: 5px; padding: 10px; }
+        textarea, input { width: 300px; margin: 5px; }
+        .log { background: #f5f5f5; padding: 10px; margin: 10px 0; max-height: 300px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>🚨 Frontend Card Creation Debug Test</h1>
+    <p>This test simulates the exact frontend card creation flow to identify issues.</p>
+
+    <div class="test-section">
+        <h2>Test Configuration</h2>
+        <label>Board ID: <input type="text" id="boardId" value="1"></label><br>
+        <label>Column ID: <input type="text" id="columnId" value="not_started"></label><br>
+        <label>Card Title: <input type="text" id="cardTitle" value="Frontend Debug Test Card"></label><br>
+        <label>Card Description: <textarea id="cardDescription">Testing frontend card creation</textarea></label><br>
+        <label>Priority:
+            <select id="priority">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+            </select>
+        </label><br>
+        <label>Assignee: <input type="text" id="assignee" value="debug-tester"></label><br>
+    </div>
+
+    <div class="test-section">
+        <h2>API Tests</h2>
+        <button onclick="testBoard()">Test Board API</button>
+        <button onclick="testCreateCard()">Test Card Creation</button>
+        <button onclick="testErrorHandling()">Test Error Handling</button>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Log</h2>
+        <div id="log" class="log"></div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            logDiv.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        async function testBoard() {
+            const boardId = document.getElementById('boardId').value;
+            log(`🔍 Testing board API for board ${boardId}...`);
+
+            try {
+                const response = await fetch(`/api/boards/${boardId}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    log(`✅ Board API successful: ${data.name}`, 'success');
+                    log(`📋 Columns: ${data.columns.join(', ')}`, 'info');
+                } else {
+                    log(`❌ Board API failed: ${response.status} - ${JSON.stringify(data)}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Board API error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateCard() {
+            const boardId = document.getElementById('boardId').value;
+            const columnId = document.getElementById('columnId').value;
+            const title = document.getElementById('cardTitle').value;
+            const description = document.getElementById('cardDescription').value;
+            const priority = document.getElementById('priority').value;
+            const assignee = document.getElementById('assignee').value;
+
+            log(`🎯 Testing card creation...`);
+            log(`📝 Board: ${boardId}, Column: ${columnId}, Title: "${title}"`);
+
+            // This mimics the exact API call from the frontend
+            const ticketData = {
+                title: title.trim(),
+                description: description.trim() || undefined,
+                acceptance_criteria: undefined,
+                priority,
+                assignee: assignee.trim() || undefined,
+                column_id: columnId,
+                board_id: boardId
+            };
+
+            log(`📤 Sending payload: ${JSON.stringify(ticketData, null, 2)}`, 'info');
+
+            try {
+                const response = await fetch('/api/tickets/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(ticketData)
+                });
+
+                const responseText = await response.text();
+                log(`📥 Raw response (${response.status}): ${responseText}`, response.ok ? 'success' : 'error');
+
+                if (response.ok) {
+                    const data = JSON.parse(responseText);
+                    log(`✅ Card created successfully! ID: ${data.id}`, 'success');
+                    log(`🎉 Card details: ${data.title} in ${data.current_column}`, 'success');
+
+                    // Clean up
+                    setTimeout(async () => {
+                        try {
+                            await fetch(`/api/tickets/${data.id}`, { method: 'DELETE' });
+                            log(`🗑️ Test card cleaned up`, 'info');
+                        } catch (e) {
+                            log(`⚠️ Cleanup failed: ${e.message}`, 'error');
+                        }
+                    }, 2000);
+                } else {
+                    log(`❌ Card creation failed: ${response.status}`, 'error');
+                    try {
+                        const errorData = JSON.parse(responseText);
+                        log(`💥 Error details: ${JSON.stringify(errorData, null, 2)}`, 'error');
+                    } catch (e) {
+                        log(`💥 Raw error: ${responseText}`, 'error');
+                    }
+                }
+            } catch (error) {
+                log(`❌ Network error: ${error.message}`, 'error');
+                log(`💥 Full error: ${error.stack}`, 'error');
+            }
+        }
+
+        async function testErrorHandling() {
+            log(`🔍 Testing error handling scenarios...`);
+
+            // Test 1: Invalid board_id
+            log(`Test 1: Invalid board_id`);
+            try {
+                const response = await fetch('/api/tickets/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: 'Error Test',
+                        board_id: 'invalid',
+                        column_id: 'not_started'
+                    })
+                });
+                const data = await response.text();
+                log(`Invalid board_id response (${response.status}): ${data}`, response.ok ? 'error' : 'success');
+            } catch (error) {
+                log(`Invalid board_id error: ${error.message}`, 'info');
+            }
+
+            // Test 2: Missing title
+            log(`Test 2: Missing title`);
+            try {
+                const response = await fetch('/api/tickets/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: '',
+                        board_id: 1,
+                        column_id: 'not_started'
+                    })
+                });
+                const data = await response.text();
+                log(`Missing title response (${response.status}): ${data}`, response.ok ? 'error' : 'success');
+            } catch (error) {
+                log(`Missing title error: ${error.message}`, 'info');
+            }
+
+            // Test 3: Invalid column
+            log(`Test 3: Invalid column`);
+            try {
+                const response = await fetch('/api/tickets/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: 'Error Test',
+                        board_id: 1,
+                        column_id: 'invalid_column'
+                    })
+                });
+                const data = await response.text();
+                log(`Invalid column response (${response.status}): ${data}`, response.ok ? 'error' : 'success');
+            } catch (error) {
+                log(`Invalid column error: ${error.message}`, 'info');
+            }
+        }
+
+        // Test on page load
+        window.onload = function() {
+            log('🚀 Frontend debug test loaded');
+            log('📍 Running on: ' + window.location.origin);
+            testBoard();
+        };
+    </script>
+</body>
+</html>

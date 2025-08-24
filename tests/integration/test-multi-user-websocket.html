@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-User WebSocket Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { display: flex; gap: 20px; }
+        .client { border: 1px solid #ccc; padding: 15px; flex: 1; }
+        .client h3 { margin-top: 0; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .connected { background-color: #d4edda; color: #155724; }
+        .disconnected { background-color: #f8d7da; color: #721c24; }
+        .message { margin: 5px 0; padding: 8px; background: #f8f9fa; border-left: 3px solid #007bff; }
+        .controls { margin: 10px 0; }
+        button { padding: 8px 15px; margin: 5px; cursor: pointer; }
+        input { padding: 5px; margin: 5px; }
+        .log { height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; }
+        .test-actions { background: #f0f0f0; padding: 15px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>Multi-User WebSocket Sync Test</h1>
+    <p>This test simulates two browser windows to verify real-time synchronization.</p>
+
+    <div class="test-actions">
+        <h3>Test Actions</h3>
+        <button onclick="simulateDragDrop()">Simulate Drag & Drop</button>
+        <button onclick="simulateTicketUpdate()">Simulate Ticket Update</button>
+        <button onclick="simulateTicketCreation()">Simulate Ticket Creation</button>
+        <button onclick="clearLogs()">Clear Logs</button>
+    </div>
+
+    <div class="container">
+        <div class="client">
+            <h3>Client 1 (Primary)</h3>
+            <div id="status1" class="status disconnected">Disconnected</div>
+            <div class="controls">
+                <button onclick="connect1()">Connect</button>
+                <button onclick="disconnect1()">Disconnect</button>
+                <button onclick="sendTestMessage1()">Send Test Message</button>
+            </div>
+            <div class="log" id="log1"></div>
+        </div>
+
+        <div class="client">
+            <h3>Client 2 (Secondary)</h3>
+            <div id="status2" class="status disconnected">Disconnected</div>
+            <div class="controls">
+                <button onclick="connect2()">Connect</button>
+                <button onclick="disconnect2()">Disconnect</button>
+                <button onclick="sendTestMessage2()">Send Test Message</button>
+            </div>
+            <div class="log" id="log2"></div>
+        </div>
+    </div>
+
+    <div class="test-results" id="testResults">
+        <h3>Test Results</h3>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        let ws1, ws2;
+        let messageCount1 = 0, messageCount2 = 0;
+        let testResults = [];
+
+        const WS_URL = 'ws://localhost:18000/ws/connect';
+
+        function log(clientId, message, type = 'info') {
+            const logElement = document.getElementById(`log${clientId}`);
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#007bff';
+            logElement.innerHTML += `<div style="color: ${color};">[${timestamp}] ${message}</div>`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function updateStatus(clientId, connected) {
+            const statusElement = document.getElementById(`status${clientId}`);
+            statusElement.textContent = connected ? 'Connected' : 'Disconnected';
+            statusElement.className = `status ${connected ? 'connected' : 'disconnected'}`;
+        }
+
+        function createWebSocket(clientId) {
+            const ws = new WebSocket(WS_URL);
+
+            ws.onopen = () => {
+                log(clientId, '✅ WebSocket connected', 'success');
+                updateStatus(clientId, true);
+            };
+
+            ws.onclose = (event) => {
+                log(clientId, `❌ WebSocket disconnected: ${event.code} ${event.reason}`, 'error');
+                updateStatus(clientId, false);
+            };
+
+            ws.onerror = (error) => {
+                log(clientId, `🚨 WebSocket error: ${error}`, 'error');
+                updateStatus(clientId, false);
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const message = JSON.parse(event.data);
+                    if (clientId === 1) messageCount1++;
+                    else messageCount2++;
+
+                    // Skip heartbeat messages for cleaner logs
+                    if (message.event === 'heartbeat' || message.type === 'pong') {
+                        return;
+                    }
+
+                    log(clientId, `📡 Received: ${JSON.stringify(message, null, 2)}`, 'success');
+
+                    // Track test results
+                    if (message.event && message.event.startsWith('ticket_')) {
+                        testResults.push({
+                            client: clientId,
+                            event: message.event,
+                            data: message.data,
+                            timestamp: new Date().toISOString()
+                        });
+                        updateTestResults();
+                    }
+                } catch (error) {
+                    log(clientId, `🚨 Failed to parse message: ${error}`, 'error');
+                }
+            };
+
+            return ws;
+        }
+
+        function connect1() {
+            if (ws1) ws1.close();
+            ws1 = createWebSocket(1);
+        }
+
+        function connect2() {
+            if (ws2) ws2.close();
+            ws2 = createWebSocket(2);
+        }
+
+        function disconnect1() {
+            if (ws1) {
+                ws1.close();
+                ws1 = null;
+            }
+        }
+
+        function disconnect2() {
+            if (ws2) {
+                ws2.close();
+                ws2 = null;
+            }
+        }
+
+        function sendTestMessage1() {
+            if (ws1 && ws1.readyState === WebSocket.OPEN) {
+                const message = { type: 'test', data: { from: 'client1', timestamp: Date.now() } };
+                ws1.send(JSON.stringify(message));
+                log(1, `📤 Sent: ${JSON.stringify(message)}`, 'info');
+            } else {
+                log(1, '❌ WebSocket not connected', 'error');
+            }
+        }
+
+        function sendTestMessage2() {
+            if (ws2 && ws2.readyState === WebSocket.OPEN) {
+                const message = { type: 'test', data: { from: 'client2', timestamp: Date.now() } };
+                ws2.send(JSON.stringify(message));
+                log(2, `📤 Sent: ${JSON.stringify(message)}`, 'info');
+            } else {
+                log(2, '❌ WebSocket not connected', 'error');
+            }
+        }
+
+        function simulateDragDrop() {
+            // Simulate a drag-drop operation via API call
+            fetch('/api/tickets/1/move', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ column: 'In Progress', moved_by: 'test-client' })
+            }).then(response => {
+                if (response.ok) {
+                    log(1, '✅ Simulated drag-drop operation', 'success');
+                    log(2, '⏳ Waiting for WebSocket event...', 'info');
+                } else {
+                    log(1, `❌ Drag-drop simulation failed: ${response.status}`, 'error');
+                }
+            }).catch(error => {
+                log(1, `🚨 Drag-drop simulation error: ${error}`, 'error');
+            });
+        }
+
+        function simulateTicketUpdate() {
+            fetch('/api/tickets/1', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: `Updated Ticket ${Date.now()}`,
+                    changed_by: 'test-client'
+                })
+            }).then(response => {
+                if (response.ok) {
+                    log(1, '✅ Simulated ticket update', 'success');
+                    log(2, '⏳ Waiting for WebSocket event...', 'info');
+                } else {
+                    log(1, `❌ Ticket update simulation failed: ${response.status}`, 'error');
+                }
+            }).catch(error => {
+                log(1, `🚨 Ticket update simulation error: ${error}`, 'error');
+            });
+        }
+
+        function simulateTicketCreation() {
+            fetch('/api/tickets/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: `New Test Ticket ${Date.now()}`,
+                    description: 'Created via multi-user WebSocket test',
+                    board_id: 1,
+                    current_column: 'Not Started',
+                    created_by: 'test-client'
+                })
+            }).then(response => {
+                if (response.ok) {
+                    log(1, '✅ Simulated ticket creation', 'success');
+                    log(2, '⏳ Waiting for WebSocket event...', 'info');
+                } else {
+                    log(1, `❌ Ticket creation simulation failed: ${response.status}`, 'error');
+                }
+            }).catch(error => {
+                log(1, `🚨 Ticket creation simulation error: ${error}`, 'error');
+            });
+        }
+
+        function clearLogs() {
+            document.getElementById('log1').innerHTML = '';
+            document.getElementById('log2').innerHTML = '';
+            testResults = [];
+            messageCount1 = 0;
+            messageCount2 = 0;
+            updateTestResults();
+        }
+
+        function updateTestResults() {
+            const resultsElement = document.getElementById('results');
+            const recentResults = testResults.slice(-10); // Show last 10 events
+
+            let html = `
+                <p><strong>Message Counts:</strong> Client 1: ${messageCount1}, Client 2: ${messageCount2}</p>
+                <p><strong>Recent Events:</strong></p>
+            `;
+
+            if (recentResults.length === 0) {
+                html += '<p>No events received yet. Try the test actions above.</p>';
+            } else {
+                recentResults.forEach(result => {
+                    html += `
+                        <div style="margin: 5px 0; padding: 8px; background: ${result.client === 1 ? '#e7f3ff' : '#fff3e7'}; border-radius: 3px;">
+                            <strong>Client ${result.client}:</strong> ${result.event}
+                            <small>(${new Date(result.timestamp).toLocaleTimeString()})</small>
+                        </div>
+                    `;
+                });
+            }
+
+            // Check for sync issues
+            const client1Events = testResults.filter(r => r.client === 1).length;
+            const client2Events = testResults.filter(r => r.client === 2).length;
+
+            if (client1Events > 0 && client2Events > 0) {
+                html += '<div style="color: green; font-weight: bold; margin-top: 10px;">✅ Multi-user sync working - both clients receiving events!</div>';
+            } else if (client1Events > 0 || client2Events > 0) {
+                html += '<div style="color: orange; font-weight: bold; margin-top: 10px;">⚠️ Partial sync - only one client receiving events</div>';
+            }
+
+            resultsElement.innerHTML = html;
+        }
+
+        // Auto-connect both clients on page load
+        window.onload = () => {
+            setTimeout(() => {
+                connect1();
+                connect2();
+            }, 500);
+        };
+
+        // Cleanup on page unload
+        window.onbeforeunload = () => {
+            if (ws1) ws1.close();
+            if (ws2) ws2.close();
+        };
+    </script>
+</body>
+</html>
