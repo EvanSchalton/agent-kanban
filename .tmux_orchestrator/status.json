@@ -1,11 +1,11 @@
 {
-  "last_updated": "2025-08-24T22:23:36.207146+00:00",
+  "last_updated": "2025-08-24T22:24:56.173209+00:00",
   "daemon_status": {
     "monitor": {
       "running": true,
       "pid": 70843,
-      "uptime_seconds": 6397,
-      "last_check": "2025-08-24T22:23:36.206715"
+      "uptime_seconds": 6477,
+      "last_check": "2025-08-24T22:24:56.172832"
     },
     "messaging": {
       "running": false,
@@ -17,70 +17,70 @@
       "name": "claude-senior developer",
       "type": "Developer",
       "status": "idle",
-      "last_activity": "2025-08-24T22:23:36.166851",
+      "last_activity": "2025-08-24T22:24:56.124906",
       "pane_id": null,
       "session": "fullclean",
       "window": 2,
       "state_details": {
         "idle_count": 0,
         "content_based_state": "active",
-        "last_content_check": "2025-08-24T22:23:36.166862"
+        "last_content_check": "2025-08-24T22:24:56.124918"
       }
     },
     "fullclean:3": {
       "name": "claude-qa engineer",
       "type": "QA Engineer",
       "status": "active",
-      "last_activity": "2025-08-24T22:23:36.177221",
+      "last_activity": "2025-08-24T22:24:56.137704",
       "pane_id": null,
       "session": "fullclean",
       "window": 3,
       "state_details": {
         "idle_count": 0,
         "content_based_state": "active",
-        "last_content_check": "2025-08-24T22:23:36.177231"
+        "last_content_check": "2025-08-24T22:24:56.137716"
       }
     },
     "fullclean:4": {
       "name": "claude-devops engineer",
       "type": "DevOps",
-      "status": "active",
-      "last_activity": "2025-08-24T22:23:36.186805",
+      "status": "idle",
+      "last_activity": "2025-08-24T22:24:56.150180",
       "pane_id": null,
       "session": "fullclean",
       "window": 4,
       "state_details": {
         "idle_count": 0,
         "content_based_state": "active",
-        "last_content_check": "2025-08-24T22:23:36.186817"
+        "last_content_check": "2025-08-24T22:24:56.150196"
       }
     },
     "fullclean:5": {
       "name": "claude-pm",
       "type": "Project Manager",
       "status": "active",
-      "last_activity": "2025-08-24T22:23:36.196421",
+      "last_activity": "2025-08-24T22:24:56.162084",
       "pane_id": null,
       "session": "fullclean",
       "window": 5,
       "state_details": {
         "idle_count": 0,
         "content_based_state": "active",
-        "last_content_check": "2025-08-24T22:23:36.196431"
+        "last_content_check": "2025-08-24T22:24:56.162096"
       }
     },
     "gitcommit:2": {
       "name": "claude-pm",
       "type": "Project Manager",
-      "status": "idle",
-      "last_activity": "2025-08-24T22:23:36.206691",
+      "status": "active",
+      "last_activity": "2025-08-24T22:24:56.172807",
       "pane_id": null,
       "session": "gitcommit",
       "window": 2,
       "state_details": {
         "idle_count": 0,
         "content_based_state": "active",
-        "last_content_check": "2025-08-24T22:23:36.206703"
+        "last_content_check": "2025-08-24T22:24:56.172819"
       }
     }
   },
