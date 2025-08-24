@@ -1,7 +1,10 @@
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlmodel import Field, Relationship, SQLModel
+
+if TYPE_CHECKING:
+    from .ticket import Ticket
 
 
 class TicketHistory(SQLModel, table=True):
